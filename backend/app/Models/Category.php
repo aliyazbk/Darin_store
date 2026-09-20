@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -23,4 +24,26 @@ public function down(): void
 {
     Schema::dropIfExists('categories');
 }
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'image',
+        'is_active',
+        'display_order',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'display_order' => 'integer',
+        ];
+    }
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
 }
