@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Products extends Model
+class Product extends Model
 {
   
   protected $fillable = [
@@ -37,7 +37,7 @@ class Products extends Model
     }
     public function variants(): HasMany
 {
-    return $this->hasMany(ProductVariant::class);
+    return $this->hasMany(ProductVarient::class);
 }
 public function images(): HasMany
 {

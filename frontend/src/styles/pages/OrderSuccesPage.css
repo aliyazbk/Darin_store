@@ -1,0 +1,197 @@
+.order-success-page {
+  --success-wine: #6f263d;
+  --success-wine-dark: #4e172a;
+  --success-rose: #b86b82;
+  --success-blush: #f4e6e8;
+  --success-cream: #faf7f2;
+  --success-ink: #241b1e;
+  --success-muted: #75686d;
+  --success-border: #eadfe1;
+
+  display: grid;
+  min-height: calc(100vh - 80px);
+  padding: 60px 20px;
+  place-items: center;
+  color: var(--success-ink);
+  background:
+    radial-gradient(
+      circle at 20% 15%,
+      rgba(184, 107, 130, 0.2),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 85%,
+      rgba(111, 38, 61, 0.1),
+      transparent 28%
+    ),
+    var(--success-cream);
+}
+
+.success-card {
+  width: min(100%, 680px);
+  box-sizing: border-box;
+  padding: clamp(32px, 7vw, 64px);
+  border: 1px solid rgba(111, 38, 61, 0.12);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 30px 90px rgba(70, 34, 45, 0.12);
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.success-icon {
+  display: grid;
+  width: 82px;
+  height: 82px;
+  margin: 0 auto 25px;
+  border: 1px solid rgba(111, 38, 61, 0.18);
+  border-radius: 50%;
+  place-items: center;
+  background: var(--success-blush);
+  color: var(--success-wine);
+  box-shadow: 0 12px 30px rgba(111, 38, 61, 0.12);
+}
+
+.success-icon span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.success-label {
+  margin: 0 0 10px;
+  color: var(--success-rose);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.success-card h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.3rem, 7vw, 4.2rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.success-message {
+  max-width: 500px;
+  margin: 20px auto 30px;
+  color: var(--success-muted);
+  line-height: 1.8;
+}
+
+.order-reference {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding: 18px 20px;
+  border-radius: 15px;
+  background: var(--success-blush);
+}
+
+.order-reference span {
+  color: var(--success-muted);
+  font-size: 0.84rem;
+}
+
+.order-reference strong {
+  color: var(--success-wine);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+}
+
+.success-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 32px;
+  border: 1px solid var(--success-border);
+  border-radius: 17px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.success-details div {
+  display: flex;
+  min-width: 0;
+  padding: 18px;
+  flex-direction: column;
+  gap: 7px;
+  border-bottom: 1px solid var(--success-border);
+}
+
+.success-details div:nth-child(odd) {
+  border-right: 1px solid var(--success-border);
+}
+
+.success-details div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.success-details span {
+  color: var(--success-muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.success-details strong {
+  overflow-wrap: anywhere;
+  font-size: 0.95rem;
+}
+
+.continue-shopping-button {
+  display: inline-flex;
+  min-height: 54px;
+  padding: 0 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(
+    135deg,
+    var(--success-wine),
+    var(--success-wine-dark)
+  );
+  box-shadow: 0 14px 30px rgba(111, 38, 61, 0.25);
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.continue-shopping-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(111, 38, 61, 0.32);
+}
+
+@media (max-width: 560px) {
+  .order-success-page {
+    padding: 30px 14px;
+  }
+
+  .success-card {
+    padding: 35px 20px;
+    border-radius: 22px;
+  }
+
+  .success-details {
+    grid-template-columns: 1fr;
+  }
+
+  .success-details div,
+  .success-details div:nth-child(odd),
+  .success-details div:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--success-border);
+  }
+
+  .success-details div:last-child {
+    border-bottom: 0;
+  }
+}
