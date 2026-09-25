@@ -1,0 +1,50 @@
+.variant-selector {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.variant-selector fieldset {
+  padding: 0;
+  border: 0;
+}
+
+.variant-selector legend {
+  margin-bottom: 0.7rem;
+  padding: 0;
+
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.variant-selector__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.variant-selector__button {
+  min-width: 54px;
+  min-height: 42px;
+  padding: 0.6rem 1rem;
+
+  border: 1px solid var(--line);
+  border-radius: 999px;
+
+  background: transparent;
+  color: var(--ink);
+}
+
+.variant-selector__button:hover:not(:disabled) {
+  border-color: var(--wine);
+  background: var(--wine-soft);
+  color: var(--wine-dark);
+}
+
+.variant-selector__button.selected {
+  border-color: var(--wine-dark);
+  background: var(--wine-dark);
+  color: #ffffff;
+}

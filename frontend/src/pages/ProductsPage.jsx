@@ -1,9 +1,9 @@
 import useProducts from "../hooks/useProducts";
-import ProductGrid from "../components/products/ProductGrid";
+import ProductGrid from "../components/Products/ProductGrid";
 import LoadingMessage from "../components/ui/LoadingMessage";
 import ErrorMessage from "../components/ui/ErrorMessage";
 import EmptyMessage from "../components/ui/EmptyMessage";
-
+import "../styles/pages/ProductPage.css";
 function ProductsPage() {
   const {
     products,

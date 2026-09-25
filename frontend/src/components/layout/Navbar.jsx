@@ -7,7 +7,7 @@ function Navbar() {
   return (
     <header className="navbar">
       <Link to="/" className="navbar__brand">
-        Darin
+        Darin clothet
       </Link>
 
       <nav aria-label="Main navigation">

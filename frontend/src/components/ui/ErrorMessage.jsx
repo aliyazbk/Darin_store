@@ -1,5 +1,14 @@
+import "../../styles/components/FeedbackMessage.css";
+
 function ErrorMessage({ message }) {
-  return <p role="alert">{message}</p>;
+  return (
+    <p
+      className="ui-message ui-message--error"
+      role="alert"
+    >
+      {message}
+    </p>
+  );
 }
 
 export default ErrorMessage;

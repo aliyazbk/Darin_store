@@ -1,4 +1,5 @@
 import VariantSelector from "./VariantSelector";
+import "../../styles/components/ProductInfo.css";
 
 function ProductInfo({
   product,

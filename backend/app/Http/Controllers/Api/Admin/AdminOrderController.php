@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\ProductVariant;
+use App\Models\ProductVarient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -105,7 +105,7 @@ class AdminOrderController extends Controller
             foreach ($lockedOrder->items as $item) {
                 
                     if ($item->product_varient_id) {
-                    ProductVariant::whereKey($item->product_varient_id)
+                    ProductVarient::whereKey($item->product_varient_id)
                         ->increment('stock_quantity', $item->quantity);
 
             }

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-
+import "../../styles/components/ProductCard.css";
 function ProductCard({ product }) {
   const primaryImage =
     product.images?.find((image) => image.is_primary) ??
@@ -9,10 +9,17 @@ function ProductCard({ product }) {
     <article className="product-card">
       <Link to={`/products/${product.slug}`}>
         <div className="product-card__image-container">
-          {primaryImage ? (
-            <p>Product image coming soon</p>
+          {primaryImage?.image_url ? (
+            <img
+              src={primaryImage.image_url}
+              alt={primaryImage.alt_text || product.name}
+              className="product-card__image"
+              loading="lazy"
+            />
           ) : (
-            <p>No image available</p>
+            <div className="product-card__placeholder">
+              No image available
+            </div>
           )}
         </div>
 
@@ -21,16 +28,18 @@ function ProductCard({ product }) {
             {product.category?.name}
           </p>
 
-          <h2 className="product-card__name">{product.name}</h2>
+          <h2 className="product-card__name">
+            {product.name}
+          </h2>
 
           <div className="product-card__prices">
             <span className="product-card__price">
-              ${product.base_price}
+              ${Number(product.base_price).toFixed(2)}
             </span>
 
             {product.compare_at_price && (
               <span className="product-card__old-price">
-                ${product.compare_at_price}
+                ${Number(product.compare_at_price).toFixed(2)}
               </span>
             )}
           </div>

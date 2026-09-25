@@ -1,10 +1,11 @@
+import "./../styles/pages/CartPage.css";
+
 import { Link } from "react-router-dom";
 
 import useCart from "../hooks/useCart";
 import CartList from "../components/cart/CartList";
 import CartSummary from "../components/cart/CartSummary";
 import EmptyMessage from "../components/ui/EmptyMessage";
-
 function CartPage() {
   const {
     items,

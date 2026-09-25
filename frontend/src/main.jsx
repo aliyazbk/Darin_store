@@ -1,17 +1,18 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-
+import { AdminAuthProvider } from "./context/AdminAuthContext.jsx";
 import App from "./App.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
-import "./index.css";
-
+import "./styles/base.css";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <CartProvider>
-        <App />
-      </CartProvider>
+      <AdminAuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AdminAuthProvider>
     </BrowserRouter>
   </StrictMode>
 );

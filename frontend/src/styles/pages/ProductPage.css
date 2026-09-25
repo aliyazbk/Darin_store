@@ -1,0 +1,23 @@
+.products-page {
+  display: grid;
+  gap: 2.5rem;
+}
+
+.products-page__header {
+  max-width: 650px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.products-page__header p {
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.products-page__header h1 {
+  margin-bottom: 0;
+}

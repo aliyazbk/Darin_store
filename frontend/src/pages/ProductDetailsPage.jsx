@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect,useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-
-import useProduct from "../hooks/useProducts";
+import "./../styles/pages/ProductDetailPage.css";
+//import useProduct from "../hooks/useProducts";
 import useCart from "../hooks/useCart";
-
+import useProduct from "../hooks/useProduct";
 import ProductGallery from "../components/Products/ProductGallery";
 import ProductInfo from "../components/Products/ProductInfo";
 import LoadingMessage from "../components/ui/LoadingMessage";
@@ -17,6 +17,23 @@ function ProductDetailsPage() {
 
   const [selectedVariant, setSelectedVariant] =
     useState(null);
+    const visibleImages = useMemo(() => {
+  const images = product?.images ?? [];
+
+  if (!selectedVariant?.color) {
+    return images;
+  }
+
+  const matchingImages = images.filter(
+    (image) =>
+      !image.color ||
+      image.color === selectedVariant.color
+  );
+
+  return matchingImages.length > 0
+    ? matchingImages
+    : images;
+}, [product, selectedVariant]);
 
   useEffect(() => {
     if (product?.variants?.length > 0) {
@@ -49,10 +66,10 @@ function ProductDetailsPage() {
 
   return (
     <div className="product-details">
-      <ProductGallery
-        images={product.images}
-        productName={product.name}
-      />
+     <ProductGallery
+  images={visibleImages}
+  productName={product.name}
+/>
 
       <ProductInfo
         product={product}
