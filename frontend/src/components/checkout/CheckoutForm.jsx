@@ -29,12 +29,19 @@ const fields = [
     type: "text",
     placeholder: "Beirut",
   },
-  {
-    name: "address",
-    label: "Full address",
-    type: "text",
-    placeholder: "Street, building, floor",
-  },
+{
+  name: "street_name",
+  label: "Street name",
+  type: "text",
+  placeholder: "Hamra Street",
+},
+{
+  name: "address",
+  label: "Building and delivery details",
+  type: "text",
+  placeholder: "Building name, floor, apartment",
+},
+
 ];
 
 export default function CheckoutForm({

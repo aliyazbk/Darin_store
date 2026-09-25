@@ -25,6 +25,7 @@ class OrderItem extends Model
             'unit_price' => 'decimal:2',
             'quantity' => 'integer',
             'line_total' => 'decimal:2',
+            
         ];
     }
 

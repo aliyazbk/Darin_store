@@ -13,6 +13,7 @@ class Order extends Model
         'email',
         'governorate',
         'city',
+        'street_name',
         'address',
         'landmark',
         'customer_note',

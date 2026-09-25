@@ -9,7 +9,13 @@ export async function getProducts(page = 1) {
 }
 
 export async function getProductBySlug(slug) {
-  const response = await api.get(`/products/${slug}`);
+  if (!slug) {
+    throw new Error("Product slug is required.");
+  }
+
+  const response = await api.get(
+    `/products/${encodeURIComponent(slug)}`
+  );
 
   return response.data;
 }

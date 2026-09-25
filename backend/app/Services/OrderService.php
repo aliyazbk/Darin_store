@@ -98,6 +98,7 @@ class OrderService
                 'email' => $data['email'] ?? null,
                 'governorate' => $data['governorate'],
                 'city' => $data['city'],
+                'street_name' => $data['street_name'],
                 'address' => $data['address'],
                 'landmark' => $data['landmark'] ?? null,
                 'customer_note' =>

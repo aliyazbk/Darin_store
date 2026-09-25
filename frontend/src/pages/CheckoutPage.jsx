@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useCart } from "../hooks/useCart";
+import  useCart  from "../hooks/useCart";
 import useCheckout from "../hooks/useCheckout";
 import CheckoutForm from "../components/checkout/CheckoutForm";
 import OrderSummary from "../components/checkout/OrderSummery";
@@ -12,6 +12,7 @@ const initialFormData = {
   email: "",
   governorate: "",
   city: "",
+  street_name: "",
   address: "",
   notes: "",
 };
@@ -20,19 +21,24 @@ const DELIVERY_FEE = 5;
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const { cartItems, clearCart } = useCart();
+  const { items: cartItems = [], clearCart } = useCart();
   const { submitOrder, isSubmitting, errors, generalError } =
     useCheckout();
 
   const [formData, setFormData] = useState(initialFormData);
 
   const subtotal = useMemo(() => {
-    return cartItems.reduce(
-      (total, item) =>
-        total + Number(item.unit_price) * Number(item.quantity),
+  return cartItems.reduce((total, item) => {
+    const price = Number(
+      item.unit_price ??
+      item.price ??
+      item.variant?.price ??
       0
     );
-  }, [cartItems]);
+
+    return total + price * Number(item.quantity);
+  }, 0);
+}, [cartItems]);
 
   const total = subtotal + DELIVERY_FEE;
 
@@ -54,10 +60,15 @@ export default function CheckoutPage() {
       // Do not send an empty optional email.
       email: formData.email.trim() || null,
 
-      items: cartItems.map((item) => ({
-        product_variant_id: item.product_variant_id,
-        quantity: Number(item.quantity),
-      })),
+     items: cartItems.map((item) => ({
+      variant_id:
+        item.variant_id ??
+        item.product_variant_id ??
+        item.variantId ??
+        item.variant?.id,
+    
+      quantity: Number(item.quantity),
+})),
     };
 
     try {

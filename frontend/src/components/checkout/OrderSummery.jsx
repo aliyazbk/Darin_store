@@ -9,26 +9,42 @@ export default function OrderSummary({
       <h2>Order summary</h2>
 
       <div className="summary-items">
-        {items.map((item) => (
-          <div
-            className="summary-item"
-            key={item.product_variant_id}
-          >
-            <div>
-              <strong>{item.product_name}</strong>
-
-              <p>
-                Size: {item.size} | Color: {item.color}
-              </p>
-
-              <p>Quantity: {item.quantity}</p>
-            </div>
-
-            <span>
-              ${(Number(item.unit_price) * item.quantity).toFixed(2)}
-            </span>
-          </div>
-        ))}
+       {items.map((item, index) => {
+            const productName =
+              item.product_name ??
+              item.name ??
+              item.product?.name ??
+              "Product";
+                
+            const price = Number(
+              item.unit_price ??
+              item.price ??
+              item.variant?.price ??
+              0
+            );
+          
+            return (
+              <div
+                className="summary-item"
+                key={item.product_variant_id ?? item.variant_id ?? index}
+              >
+                <div>
+                  <strong>{productName}</strong>
+            
+                  <p>
+                    Size: {item.size ?? item.variant?.size} | Color:{" "}
+                    {item.color ?? item.variant?.color}
+                  </p>
+            
+                  <p>Quantity: {item.quantity}</p>
+                </div>
+            
+                <span>
+                  ${(price * Number(item.quantity)).toFixed(2)}
+                </span>
+              </div>
+            );
+          })}
       </div>
 
       <div className="summary-row">

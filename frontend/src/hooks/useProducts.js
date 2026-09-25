@@ -1,49 +1,32 @@
 import { useEffect, useState } from "react";
-import { getProductBySlug } from "../services/productService";
+import { getProducts } from "../services/productService";
 
-function useProduct(slug) {
-  const [product, setProduct] = useState(null);
+export default function useProducts() {
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    let requestIsActive = true;
-
-    async function loadProduct() {
+    const loadProducts = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const result = await getProductBySlug(slug);
+        const response = await getProducts();
 
-        if (requestIsActive) {
-          setProduct(result);
-        }
+        // Supports both paginated and non-paginated Laravel responses
+        setProducts(response.data?.data ?? response.data ?? []);
       } catch (error) {
-        console.error(error);
-
-        if (requestIsActive) {
-          if (error.response?.status === 404) {
-            setError("Product not found.");
-          } else {
-            setError("Unable to load the product.");
-          }
-        }
+        console.error("Unable to load products:", error);
+        setError("Unable to load products.");
       } finally {
-        if (requestIsActive) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
-    }
-
-    loadProduct();
-
-    return () => {
-      requestIsActive = false;
     };
-  }, [slug]);
 
-  return { product, loading, error };
+    loadProducts();
+  }, []);
+
+  return { products, loading, error };
 }
 
-export default useProduct;

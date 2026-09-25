@@ -73,6 +73,15 @@ class StoreOrderRequest extends FormRequest
                 'min:1',
                 'max:20',
             ],
+            'street_name' =>  [
+                'required', 
+                  'string',
+                    'max:255'
+            ],
+             'address' =>[
+                'required',
+                'string'
+             ,  'max:500'],
         ];
     }
 }
