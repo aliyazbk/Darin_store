@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
-
+import { getFinalPrice } from "../utils/productPricing";
 export const CartContext = createContext(null);
 
 function getInitialCart() {
@@ -53,7 +53,7 @@ export function CartProvider({ children }) {
           name: product.name,
           size: variant.size,
           color: variant.color,
-          price: Number(variant.price ?? product.base_price),
+          price: getFinalPrice(product, variant),
           quantity,
           stockQuantity: variant.stock_quantity,
         },

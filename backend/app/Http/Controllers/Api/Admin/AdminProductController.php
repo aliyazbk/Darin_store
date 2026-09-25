@@ -80,12 +80,15 @@ class AdminProductController extends Controller
 
                 'compare_at_price' =>
                     $validated['compare_at_price'] ?? null,
+                'sale_percentage' =>
+                     $validated['sale_percentage'],
 
                 'is_active' =>
                     $validated['is_active'] ?? true,
 
                 'is_featured' =>
                     $validated['is_featured'] ?? false,
+                    
             ]);
 
             foreach ($validated['variants'] as $variant) {

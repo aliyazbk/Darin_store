@@ -2,21 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
-  
-  protected $fillable = [
+    protected $fillable = [
         'category_id',
         'name',
         'slug',
         'description',
         'base_price',
         'compare_at_price',
+        'sale_percentage',
         'is_active',
         'is_featured',
     ];
@@ -26,6 +25,7 @@ class Product extends Model
         return [
             'base_price' => 'decimal:2',
             'compare_at_price' => 'decimal:2',
+            'sale_percentage' => 'integer',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
         ];
@@ -35,13 +35,15 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
     public function variants(): HasMany
-{
-    return $this->hasMany(ProductVarient::class);
-}
-public function images(): HasMany
-{
-    return $this->hasMany(ProductImage::class)
-        ->orderBy('display_order');
-}
+    {
+        return $this->hasMany(ProductVarient::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)
+            ->orderBy('display_order');
+    }
 }

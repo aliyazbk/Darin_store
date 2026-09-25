@@ -1,60 +1,25 @@
-import {
-  useEffect,
-  useState,
-} from "react";
-
-const emptyVariant = {
-  sku: "",
-  size: "",
-  color: "",
-  stock_quantity: 0,
-  price: "",
-  is_active: true,
-};
+import { useState } from "react";
 
 export default function VariantForm({
   initialVariant = null,
-  submitLabel,
-  submitting,
+  submitLabel = "Save option",
+  submitting = false,
   onSubmit,
 }) {
-  const [variant, setVariant] =
-    useState(emptyVariant);
-
-  useEffect(() => {
-    setVariant(
-      initialVariant
-        ? {
-            sku: initialVariant.sku ?? "",
-            size: initialVariant.size ?? "",
-            color: initialVariant.color ?? "",
-
-            stock_quantity:
-              initialVariant.stock_quantity ?? 0,
-
-            price:
-              initialVariant.price ?? "",
-
-            is_active:
-              initialVariant.is_active ?? true,
-          }
-        : emptyVariant
-    );
-  }, [initialVariant]);
+  const [variant, setVariant] = useState({
+    size: initialVariant?.size ?? "",
+    color: initialVariant?.color ?? "",
+    stock_quantity: initialVariant?.stock_quantity ?? 0,
+    price: initialVariant?.price ?? "",
+    is_active: initialVariant?.is_active ?? true,
+  });
 
   function handleChange(event) {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = event.target;
+    const { name, value, type, checked } = event.target;
 
     setVariant((current) => ({
       ...current,
-      [name]: type === "checkbox"
-        ? checked
-        : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   }
 
@@ -62,34 +27,19 @@ export default function VariantForm({
     event.preventDefault();
 
     onSubmit({
-      sku: variant.sku.trim(),
+      // Keep the SKU for an existing variant.
+      // Generate one only when creating a new variant.
+      sku: initialVariant?.sku ?? `DAR-${crypto.randomUUID()}`,
       size: variant.size.trim(),
       color: variant.color.trim(),
-
-      stock_quantity:
-        Number(variant.stock_quantity),
-
-      price:
-        variant.price === ""
-          ? null
-          : Number(variant.price),
-
+      stock_quantity: Number(variant.stock_quantity),
+      price: variant.price === "" ? null : Number(variant.price),
       is_active: variant.is_active,
     });
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <label>
-        SKU
-        <input
-          name="sku"
-          value={variant.sku}
-          onChange={handleChange}
-          required
-        />
-      </label>
-
       <label>
         Size
         <input
@@ -123,7 +73,7 @@ export default function VariantForm({
       </label>
 
       <label>
-        Custom price
+        Custom price (optional)
         <input
           name="price"
           type="number"
@@ -144,10 +94,7 @@ export default function VariantForm({
         Active
       </label>
 
-      <button
-        type="submit"
-        disabled={submitting}
-      >
+      <button type="submit" disabled={submitting}>
         {submitting ? "Saving..." : submitLabel}
       </button>
     </form>

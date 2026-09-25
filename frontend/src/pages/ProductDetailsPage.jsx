@@ -14,7 +14,7 @@ function ProductDetailsPage() {
   const { slug } = useParams();
   const { product, loading, error } = useProduct(slug);
   const { addItem } = useCart();
-
+const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] =
     useState(null);
     const visibleImages = useMemo(() => {
@@ -48,8 +48,8 @@ function ProductDetailsPage() {
       return;
     }
 
-    addItem(product, selectedVariant);
-  }
+addItem(product, selectedVariant, quantity); 
+ }
 
   // Conditional returns come after every hook.
   if (loading) {
@@ -76,6 +76,8 @@ function ProductDetailsPage() {
         selectedVariant={selectedVariant}
         onVariantSelect={setSelectedVariant}
         onAddToCart={handleAddToCart}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
       />
     </div>
   );

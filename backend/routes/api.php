@@ -11,7 +11,10 @@ use App\Http\Controllers\Api\Admin\AdminProductVariantController;
 use App\Http\Controllers\Api\Admin\AdminProductImageController;
 use App\Http\Controllers\Api\Admin\AdminCategoryController;
 use App\Http\Controllers\Api\Admin\AdminDashboardController;
-
+use App\Http\Controllers\Api\HomeCatalogController;
+use App\Http\Controllers\Api\Admin\AdminHomeSectionController;
+use App\Http\Controllers\Api\StoreSettingController;
+use App\Http\Controllers\Api\Admin\AdminStoreSettingController;
 /*
 |--------------------------------------------------------------------------
 | Public routes
@@ -24,9 +27,23 @@ Route::get('/products/{product:slug}', [
     ProductController::class,
     'show',
 ]);
+Route::get('/store-settings', [
+    StoreSettingController::class,
+    'show',
+]);
 
 Route::post('/orders', [OrderController::class, 'store'])
     ->middleware('throttle:10,1');
+
+Route::get('/home/catalog', [
+    HomeCatalogController::class,
+    'index',
+]);
+
+Route::get('/categories', [
+    HomeCatalogController::class,
+    'categories',
+]);
 
 /*
 |--------------------------------------------------------------------------
@@ -132,6 +149,29 @@ Route::prefix('admin')->group(function () {
         AdminDashboardController::class,
         'index',
     ]);
+    Route::get('/home-sections', [
+    AdminHomeSectionController::class,
+    'index',
+]);
+
+Route::post('/home-sections', [
+    AdminHomeSectionController::class,
+    'store',
+]);
+
+Route::put('/home-sections/{section}', [
+    AdminHomeSectionController::class,
+    'update',
+]);
+
+Route::delete('/home-sections/{section}', [
+    AdminHomeSectionController::class,
+    'destroy',
+]);
+Route::post('/store-settings', [
+    AdminStoreSettingController::class,
+    'update',
+]);
                 
             });
 });

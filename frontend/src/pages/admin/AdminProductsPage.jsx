@@ -92,7 +92,7 @@ export default function AdminProductsPage() {
 
             <tbody>
               {products.map((product) => (
-                <tr key={product.id}>
+                <tr key={product.id} className="product-row">
                   <td>{product.name}</td>
 
                   <td>

@@ -58,10 +58,10 @@ class OrderService
                     ]);
                 }
 
-                $unitPrice = (float) (
-                    $variant->price
-                    ?? $variant->product->base_price
-                );
+                $unitPrice = ProductPricing::finalPrice(
+                    $variant->product,
+                     $variant
+                    );
 
                 $lineTotal = round(
                     $unitPrice * $quantity,

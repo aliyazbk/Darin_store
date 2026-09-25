@@ -81,7 +81,16 @@ class StoreOrderRequest extends FormRequest
              'address' =>[
                 'required',
                 'string'
-             ,  'max:500'],
-        ];
+             ,  'max:500'
+             ],
+
+
+             'sale_percentage' => [
+             'required',
+             'integer',
+             'in:0,25,50,75',
+            ],
+            ];
+        
     }
 }

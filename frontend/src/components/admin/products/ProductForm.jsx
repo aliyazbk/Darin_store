@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
 import VariantFields, {
   createEmptyVariant,
@@ -13,6 +10,7 @@ const emptyProduct = {
   description: "",
   base_price: "",
   compare_at_price: "",
+  sale_percentage: 0,
   is_active: true,
   is_featured: false,
 };
@@ -32,47 +30,26 @@ export default function ProductForm({
   ]);
 
   useEffect(() => {
-    if (!initialProduct) {
-      return;
-    }
+    if (!initialProduct) return;
 
     setProduct({
-      category_id:
-        initialProduct.category_id ?? "",
-
-      name:
-        initialProduct.name ?? "",
-
-      description:
-        initialProduct.description ?? "",
-
-      base_price:
-        initialProduct.base_price ?? "",
-
-      compare_at_price:
-        initialProduct.compare_at_price ?? "",
-
-      is_active:
-        initialProduct.is_active ?? true,
-
-      is_featured:
-        initialProduct.is_featured ?? false,
+      category_id: initialProduct.category_id ?? "",
+      name: initialProduct.name ?? "",
+      description: initialProduct.description ?? "",
+      base_price: initialProduct.base_price ?? "",
+      compare_at_price: initialProduct.compare_at_price ?? "",
+      sale_percentage: initialProduct.sale_percentage ?? 0,
+      is_active: initialProduct.is_active ?? true,
+      is_featured: initialProduct.is_featured ?? false,
     });
   }, [initialProduct]);
 
   function handleChange(event) {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = event.target;
+    const { name, value, type, checked } = event.target;
 
     setProduct((currentProduct) => ({
       ...currentProduct,
-      [name]: type === "checkbox"
-        ? checked
-        : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   }
 
@@ -82,59 +59,41 @@ export default function ProductForm({
     const payload = {
       category_id: Number(product.category_id),
       name: product.name.trim(),
-      description:
-        product.description.trim() || null,
-
-      base_price:
-        Number(product.base_price),
-
+      description: product.description.trim() || null,
+      base_price: Number(product.base_price),
       compare_at_price:
         product.compare_at_price === ""
           ? null
           : Number(product.compare_at_price),
-
+      sale_percentage: Number(product.sale_percentage),
       is_active: product.is_active,
       is_featured: product.is_featured,
     };
 
     if (includeVariants) {
-      payload.variants = variants.map(
-        (variant) => ({
-          sku: variant.sku.trim(),
-          size: variant.size.trim(),
-          color: variant.color.trim(),
-
-          stock_quantity:
-            Number(variant.stock_quantity),
-
-          price:
-            variant.price === ""
-              ? null
-              : Number(variant.price),
-
-          is_active: variant.is_active,
-        })
-      );
+      payload.variants = variants.map((variant) => ({
+        sku: `DAR-${crypto.randomUUID()}`,
+        size: variant.size.trim(),
+        color: variant.color.trim(),
+        stock_quantity: Number(variant.stock_quantity),
+        price:
+          variant.price === "" ? null : Number(variant.price),
+        is_active: variant.is_active,
+      }));
     }
 
     onSubmit(payload);
   }
 
-  const errorMessages =
-    Object.values(validationErrors).flat();
+  const errorMessages = Object.values(validationErrors).flat();
 
   return (
-    <form
-      className="admin-product-form"
-      onSubmit={handleSubmit}
-    >
+    <form className="admin-product-form" onSubmit={handleSubmit}>
       {errorMessages.length > 0 && (
         <div role="alert">
           <ul>
             {errorMessages.map((message, index) => (
-              <li key={`${message}-${index}`}>
-                {message}
-              </li>
+              <li key={`${message}-${index}`}>{message}</li>
             ))}
           </ul>
         </div>
@@ -143,10 +102,7 @@ export default function ProductForm({
       <fieldset>
         <legend>Product information</legend>
 
-        <label htmlFor="product-category">
-          Category
-        </label>
-
+        <label htmlFor="product-category">Category</label>
         <select
           id="product-category"
           name="category_id"
@@ -154,24 +110,15 @@ export default function ProductForm({
           onChange={handleChange}
           required
         >
-          <option value="">
-            Select a category
-          </option>
-
+          <option value="">Select a category</option>
           {categories.map((category) => (
-            <option
-              key={category.id}
-              value={category.id}
-            >
+            <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
         </select>
 
-        <label htmlFor="product-name">
-          Product name
-        </label>
-
+        <label htmlFor="product-name">Product name</label>
         <input
           id="product-name"
           name="name"
@@ -181,10 +128,7 @@ export default function ProductForm({
           required
         />
 
-        <label htmlFor="product-description">
-          Description
-        </label>
-
+        <label htmlFor="product-description">Description</label>
         <textarea
           id="product-description"
           name="description"
@@ -193,10 +137,7 @@ export default function ProductForm({
           rows="5"
         />
 
-        <label htmlFor="product-base-price">
-          Base price
-        </label>
-
+        <label htmlFor="product-base-price">Base price</label>
         <input
           id="product-base-price"
           name="base_price"
@@ -207,11 +148,22 @@ export default function ProductForm({
           onChange={handleChange}
           required
         />
+        <label htmlFor="product-sale">Sale</label>
+        <select
+          id="product-sale"
+          name="sale_percentage"
+          value={product.sale_percentage}
+          onChange={handleChange}
+        >
+          <option value="0">No sale</option>
+          <option value="25">25% off</option>
+          <option value="50">50% off</option>
+          <option value="75">75% off</option>
+        </select>
 
         <label htmlFor="product-compare-price">
           Compare-at price
         </label>
-
         <input
           id="product-compare-price"
           name="compare_at_price"
@@ -250,13 +202,8 @@ export default function ProductForm({
         />
       )}
 
-      <button
-        type="submit"
-        disabled={submitting}
-      >
-        {submitting
-          ? "Saving..."
-          : submitLabel}
+      <button type="submit" disabled={submitting}>
+        {submitting ? "Saving..." : submitLabel}
       </button>
     </form>
   );

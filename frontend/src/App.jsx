@@ -1,7 +1,4 @@
-import {
-  Route,
-  Routes,
-} from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import Layout from "./components/layout/layout";
 import ProtectedAdminRoute from "./components/admin/ProtectedAdminRoute";
@@ -17,94 +14,51 @@ import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminCreateProductPage from "./pages/admin/AdminCreateProductPage";
-
 import AdminManageProductPage from "./pages/admin/AdminManageProductPage";
-import AdminLayout from "./components/admin/AdminLayout";
 import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
 import AdminOrderDetailsPage from "./pages/admin/AdminOrderDetailsPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
-
-function App() {
+import AboutPage from "./pages/AboutPage";
+import AdminStorefrontPage from "./pages/admin/AdminStorefrontPage";
+export default function App() {
   return (
     <Routes>
-      {/* Customer routes */}
       <Route element={<Layout />}>
-        <Route
-          path="/"
-          element={<HomePage />}
-        />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/products/:slug" element={<ProductDetailsPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-success" element={<OrderSuccessPage />} />
+         <Route path="/about" element={<AboutPage />} />
 
-        <Route
-          path="/products"
-          element={<ProductsPage />}
-        />
-
-        <Route
-          path="/products/:slug"
-          element={<ProductDetailsPage />}
-        />
-
-        <Route
-          path="/cart"
-          element={<CartPage />}
-        />
-
-        <Route
-          path="/checkout"
-          element={<CheckoutPage />}
-        />
-
-        <Route
-          path="/order-success"
-          element={<OrderSuccessPage />}
-        />
       </Route>
 
-      {/* Public admin route */}
-      <Route
-        path="/admin/login"
-        element={<AdminLoginPage />}/>
+      <Route path="/admin/login" element={<AdminLoginPage />} />
 
-      {/* Protected admin routes */}
-      <Route element={<ProtectedAdminRoute />}/>
-
-      <Route element={<AdminLayout />}/>
-
-      <Route
-        path="/admin"
-       element={<AdminDashboardPage />}
-     />
-
-      <Route
-       path="/admin/products"
-        element={<AdminProductsPage />}
-      />
-
-      <Route
-       path="/admin/products/new"
-       element={<AdminCreateProductPage />}
-      />
-
-    <Route
-      path="/admin/products/:productId"
-      element={<AdminManageProductPage />}
-    />
-      <Route
-        path="/admin/orders"
-         element={<AdminOrdersPage />}
-       />
-       <Route
-          path="/admin/orders/:orderId"
-          element={<AdminOrderDetailsPage />}
-      />
-      <Route
-        path="/admin/categories"
-        element={<AdminCategoriesPage />}
-      />
-  </Routes>
+      <Route element={<ProtectedAdminRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/admin" element={<AdminDashboardPage />} />
+          <Route path="/admin/products" element={<AdminProductsPage />} />
+          <Route
+            path="/admin/products/new"
+            element={<AdminCreateProductPage />}
+          />
+          <Route
+            path="/admin/products/:productId"
+            element={<AdminManageProductPage />}
+          />
+          <Route path="/admin/orders" element={<AdminOrdersPage />} />
+          <Route
+            path="/admin/orders/:orderId"
+            element={<AdminOrderDetailsPage />}
+          />
+          <Route
+            path="/admin/categories"
+            element={<AdminCategoriesPage />}
+          />
+        </Route>
+      </Route>
+    </Routes>
   );
-    
-      
 }
-
-export default App;

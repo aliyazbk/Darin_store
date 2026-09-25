@@ -26,7 +26,7 @@ export default function AdminLoginPage() {
   const location = useLocation();
 
   if (isAuthenticated) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/" replace />;
   }
 
   function handleChange(event) {
@@ -47,8 +47,8 @@ export default function AdminLoginPage() {
 
       await login(form);
 
-      const destination =
-        location.state?.from?.pathname ?? "/admin";
+const destination =
+  location.state?.from?.pathname ?? "/";
 
       navigate(destination, {
         replace: true,

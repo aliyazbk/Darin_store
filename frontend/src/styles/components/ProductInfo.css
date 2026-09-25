@@ -59,3 +59,23 @@
     position: static;
   }
 }
+.product-quantity {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.product-quantity button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  font-size: 1.25rem;
+}
+
+.product-quantity span {
+  min-width: 35px;
+  text-align: center;
+}

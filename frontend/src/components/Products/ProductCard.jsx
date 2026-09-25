@@ -1,14 +1,25 @@
 import { Link } from "react-router-dom";
+import {
+  getFinalPrice,
+  getOriginalPrice,
+} from "../../utils/productPricing";
 import "../../styles/components/ProductCard.css";
 function ProductCard({ product }) {
   const primaryImage =
     product.images?.find((image) => image.is_primary) ??
     product.images?.[0];
-
+const isOnSale = Number(product.sale_percentage) > 0;
+const originalPrice = getOriginalPrice(product);
+const finalPrice = getFinalPrice(product);
   return (
     <article className="product-card">
       <Link to={`/products/${product.slug}`}>
         <div className="product-card__image-container">
+          {isOnSale && (
+          <span className="product-card__sale-badge">
+            {product.sale_percentage}% OFF
+          </span>
+        )}
           {primaryImage?.image_url ? (
             <img
               src={primaryImage.image_url}
@@ -34,14 +45,14 @@ function ProductCard({ product }) {
 
           <div className="product-card__prices">
             <span className="product-card__price">
-              ${Number(product.base_price).toFixed(2)}
-            </span>
-
-            {product.compare_at_price && (
-              <span className="product-card__old-price">
-                ${Number(product.compare_at_price).toFixed(2)}
+                ${finalPrice.toFixed(2)}
               </span>
-            )}
+
+              {isOnSale && (
+                <span className="product-card__old-price">
+                  ${originalPrice.toFixed(2)}
+                </span>
+              )}
           </div>
         </div>
       </Link>

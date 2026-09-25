@@ -17,26 +17,21 @@ export default function VariantManager({
   const [action, setAction] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [newFormKey, setNewFormKey] = useState(0);
 
-  function handleError(error) {
-    console.error("Variant request failed:", error);
+  function handleError(requestError) {
+    console.error("Variant request failed:", requestError);
 
-    const validationErrors =
-      error.response?.data?.errors;
+    const validationErrors = requestError.response?.data?.errors;
 
-    if (validationErrors) {
-      setError(
-        Object.values(validationErrors)
-          .flat()
-          .join(" ")
-      );
-    } else {
-      setError(
-        error.response?.data?.message ??
-          "Unable to save variant."
-      );
-    }
+    setError(
+      validationErrors
+        ? Object.values(validationErrors).flat().join(" ")
+        : requestError.response?.data?.message ??
+            "Unable to save variant."
+    );
   }
 
   async function handleCreate(variantData) {
@@ -45,25 +40,20 @@ export default function VariantManager({
       setError("");
       setSuccess("");
 
-      await createProductVariant(
-        productId,
-        variantData
-      );
+      await createProductVariant(productId, variantData);
 
-      setSuccess("Variant created successfully.");
+      setSuccess("Option added successfully.");
       setNewFormKey((key) => key + 1);
+      setShowAddForm(false);
       onUpdated();
-    } catch (error) {
-      handleError(error);
+    } catch (requestError) {
+      handleError(requestError);
     } finally {
       setAction("");
     }
   }
 
-  async function handleUpdate(
-    variantId,
-    variantData
-  ) {
+  async function handleUpdate(variantId, variantData) {
     try {
       setAction(`update-${variantId}`);
       setError("");
@@ -75,38 +65,31 @@ export default function VariantManager({
         variantData
       );
 
-      setSuccess("Variant updated successfully.");
+      setSuccess("Option updated successfully.");
+      setEditingId(null);
       onUpdated();
-    } catch (error) {
-      handleError(error);
+    } catch (requestError) {
+      handleError(requestError);
     } finally {
       setAction("");
     }
   }
 
   async function handleDeactivate(variantId) {
-    const confirmed = window.confirm(
-      "Deactivate this variant?"
-    );
-
-    if (!confirmed) {
-      return;
-    }
+    if (!window.confirm("Deactivate this option?")) return;
 
     try {
       setAction(`delete-${variantId}`);
       setError("");
       setSuccess("");
 
-      await deactivateProductVariant(
-        productId,
-        variantId
-      );
+      await deactivateProductVariant(productId, variantId);
 
-      setSuccess("Variant deactivated successfully.");
+      setSuccess("Option deactivated successfully.");
+      setEditingId(null);
       onUpdated();
-    } catch (error) {
-      handleError(error);
+    } catch (requestError) {
+      handleError(requestError);
     } finally {
       setAction("");
     }
@@ -114,55 +97,86 @@ export default function VariantManager({
 
   return (
     <section>
-      <h2>Variants</h2>
+      <h2>Sizes and colors</h2>
 
       {success && <p role="status">{success}</p>}
       {error && <ErrorMessage message={error} />}
 
+      {variants.length === 0 && (
+        <p>No sizes or colors have been added yet.</p>
+      )}
+
       {variants.map((variant) => (
         <article key={variant.id}>
-          <h3>
-            {variant.size} / {variant.color}
-          </h3>
+          <div>
+            <h3>
+              {variant.size} / {variant.color}
+            </h3>
+            <p>
+              Stock: {variant.stock_quantity}
+              {variant.price != null
+                ? ` · Custom price: ${variant.price}`
+                : " · Uses product price"}
+              {!variant.is_active && " · Inactive"}
+            </p>
 
-          <VariantForm
-            initialVariant={variant}
-            submitLabel="Update variant"
-            submitting={
-              action === `update-${variant.id}`
-            }
-            onSubmit={(variantData) =>
-              handleUpdate(
-                variant.id,
-                variantData
-              )
-            }
-          />
+            <button
+              type="button"
+              onClick={() =>
+                setEditingId(
+                  editingId === variant.id ? null : variant.id
+                )
+              }
+            >
+              {editingId === variant.id ? "Cancel" : "Edit"}
+            </button>
+          </div>
 
-          <button
-            type="button"
-            disabled={
-              action === `delete-${variant.id}`
-            }
-            onClick={() =>
-              handleDeactivate(variant.id)
-            }
-          >
-            Deactivate
-          </button>
+          {editingId === variant.id && (
+            <>
+              <VariantForm
+                key={variant.id}
+                initialVariant={variant}
+                submitLabel="Save changes"
+                submitting={action === `update-${variant.id}`}
+                onSubmit={(variantData) =>
+                  handleUpdate(variant.id, variantData)
+                }
+              />
+
+              {variant.is_active && (
+                <button
+                  type="button"
+                  disabled={action === `delete-${variant.id}`}
+                  onClick={() => handleDeactivate(variant.id)}
+                >
+                  Deactivate option
+                </button>
+              )}
+            </>
+          )}
         </article>
       ))}
 
-      <article>
-        <h3>Add variant</h3>
+      <button
+        type="button"
+        onClick={() => setShowAddForm((current) => !current)}
+      >
+        {showAddForm ? "Cancel" : "Add size or color"}
+      </button>
 
-        <VariantForm
-          key={newFormKey}
-          submitLabel="Add variant"
-          submitting={action === "create"}
-          onSubmit={handleCreate}
-        />
-      </article>
+      {showAddForm && (
+        <article>
+          <h3>New size and color</h3>
+
+          <VariantForm
+            key={newFormKey}
+            submitLabel="Add option"
+            submitting={action === "create"}
+            onSubmit={handleCreate}
+          />
+        </article>
+      )}
     </section>
   );
 }
