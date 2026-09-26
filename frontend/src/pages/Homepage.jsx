@@ -67,7 +67,6 @@ export default function HomePage() {
         <div className="home-hero-shade" />
 
         <div className="home-hero-content">
-          <p>New season</p>
           <h1>{settings?.hero_title || "Darin Clothet"}</h1>
           {settings?.hero_subtitle && <p>{settings.hero_subtitle}</p>}
           <Link to={settings?.hero_button_url || "/products"}>

@@ -3,7 +3,7 @@ import {
   useState,
 } from "react";
 
-import { getAdminDashboard } from "../services/adminDashboardService";
+import { getAdminDashboard } from "../services/AdminDashboardService";
 
 export default function useAdminDashboard() {
   const [statistics, setStatistics] = useState(null);

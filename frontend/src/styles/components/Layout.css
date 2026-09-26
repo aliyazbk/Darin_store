@@ -17,6 +17,33 @@
   z-index: 50;
   background: #fff;
   border-bottom: 1px solid var(--line);
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+/* On the homepage, the first 78px of the hero sits behind the header. */
+.app-layout:has(> .app-layout__content > .home-page) .store-header--transparent {
+  background: transparent;
+  border-bottom-color: transparent;
+  color: #fff;
+}
+
+.app-layout:has(> .app-layout__content > .home-page) .app-layout__content {
+  margin-top: -78px;
+}
+
+.store-header--transparent .store-logo,
+.store-header--transparent .store-icon-button,
+.store-header--transparent .store-icon-button:hover:not(:disabled) {
+  color: #fff;
+}
+
+.store-header--transparent .store-logo img {
+  filter: brightness(0) invert(1);
+}
+
+.store-header--transparent .store-cart-count {
+  background: #fff;
+  color: #171717;
 }
 
 .store-navbar {
@@ -104,16 +131,43 @@
 }
 
 .store-search {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+
   display: flex;
-  gap: 0.5rem;
-  padding: 0.8rem 1rem;
-  border-top: 1px solid var(--line);
+  gap: 0.75rem;
+  padding: 1.25rem clamp(1rem, 3vw, 2rem);
   background: #fff;
+  border-top: 1px solid var(--line);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.1);
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-12px);
+  transition:
+    opacity 250ms ease,
+    transform 250ms ease,
+    visibility 250ms;
+}
+
+.store-search.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .store-search input {
   flex: 1;
   min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-search {
+    transition: none;
+  }
 }
 
 .store-drawer {
@@ -214,6 +268,9 @@
 }
 
 @media (max-width: 600px) {
+  .app-layout:has(> .app-layout__content > .home-page) .app-layout__content {
+    margin-top: -66px;
+  }
   .store-navbar {
     height: 66px;
   }

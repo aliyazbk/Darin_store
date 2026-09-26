@@ -106,12 +106,13 @@ export default function CheckoutForm({
         <small className="field-error">{errors.items[0]}</small>
       )}
 
-      <button
+       <button
         className="place-order-button"
         type="submit"
         disabled={isSubmitting}
       >
-{isSubmitting ? "Checking prices..." : buttonText}      </button>
+       {isSubmitting ? "Checking prices..." : buttonText}    
+         </button> 
     </form>
   );
 }
