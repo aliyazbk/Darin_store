@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  background: #fff;
 }
 
 .app-layout__content {
@@ -26,18 +27,33 @@
   padding-inline: clamp(1rem, 3vw, 2rem);
 }
 
-.store-icon-button {
+.store-header .store-icon-button {
   position: relative;
   width: 42px;
   height: 42px;
+  min-height: 42px;
+  padding: 0;
   display: grid;
   place-items: center;
   border: 0;
   border-radius: 0;
   background: transparent;
   color: #171717;
+  box-shadow: none;
+  transform: none;
   font-size: 1.7rem;
+  font-weight: 400;
+  line-height: 1;
   cursor: pointer;
+}
+
+/* Cancels the global button:hover styling on header icons. */
+.store-header .store-icon-button:hover:not(:disabled),
+.store-header .store-icon-button:active:not(:disabled) {
+  background: transparent;
+  color: #171717;
+  box-shadow: none;
+  transform: none;
 }
 
 .store-icon-button svg {
@@ -53,7 +69,7 @@
 .store-logo {
   display: grid;
   place-items: center;
-  color: var(--wine-dark);
+  color: #171717;
   font-family: Georgia, serif;
   font-size: clamp(1.2rem, 2.8vw, 2rem);
   white-space: nowrap;
@@ -80,7 +96,7 @@
   height: 17px;
   padding-inline: 3px;
   border-radius: 50%;
-  background: var(--wine-dark);
+  background: #171717;
   color: #fff;
   font-size: 10px;
   line-height: 17px;
@@ -92,6 +108,7 @@
   gap: 0.5rem;
   padding: 0.8rem 1rem;
   border-top: 1px solid var(--line);
+  background: #fff;
 }
 
 .store-search input {
@@ -123,8 +140,7 @@
 }
 
 .store-drawer > a,
-.store-drawer > button,
-.store-drawer-expand {
+.store-drawer > button {
   padding: 1rem 0;
   border: 0;
   border-bottom: 1px solid #e8e8e8;
@@ -132,13 +148,24 @@
   background: transparent;
   color: #171717;
   font-size: 1.05rem;
+  font-weight: 400;
   text-align: left;
-  cursor: pointer;
+  box-shadow: none;
+  transform: none;
+}
+
+.store-drawer > button:hover:not(:disabled) {
+  background: transparent;
+  color: #171717;
+  box-shadow: none;
+  transform: none;
 }
 
 .store-drawer-expand {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
 }
 
 .store-drawer-submenu {
@@ -152,7 +179,7 @@
 
 .store-drawer-heading {
   margin-top: 1.25rem;
-  color: var(--wine-dark);
+  color: #171717;
   font-weight: 700;
 }
 
@@ -162,9 +189,19 @@
   inset: 78px 0 0;
   width: 100%;
   height: calc(100vh - 78px);
+  min-height: 0;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: rgba(0, 0, 0, 0.35);
+  box-shadow: none;
+  transform: none;
+}
+
+.store-header .store-drawer-backdrop:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: none;
+  transform: none;
 }
 
 .footer {
@@ -172,7 +209,7 @@
   justify-content: space-between;
   gap: 2rem;
   padding: 3rem max(1.5rem, calc((100% - var(--container)) / 2));
-  background: var(--ink);
+  background: #171717;
   color: #fff;
 }
 
@@ -192,5 +229,10 @@
 
   .app-layout__content {
     width: calc(100% - 1rem);
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }

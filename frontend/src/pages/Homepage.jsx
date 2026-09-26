@@ -75,7 +75,51 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+          {(catalog.sections ?? []).some(
+  (section) => section.category?.slug && section.products?.length
+) && (
+  <section className="home-collections">
+    <div className="home-section-heading">
+      <h2>Shop by <em>collection</em></h2>
+      <Link to="/products">Explore all</Link>
+    </div>
 
+    <div className="home-collections__grid">
+      {(catalog.sections ?? [])
+        .filter(
+          (section) =>
+            section.category?.slug && section.products?.length
+        )
+        .slice(0, 4)
+        .map((section) => {
+          const images = section.products[0]?.images ?? [];
+          const image =
+            images.find((item) => item.is_primary) ?? images[0];
+
+          return (
+            <Link
+              key={section.id}
+              className="home-collection"
+              to={`/products?category=${encodeURIComponent(
+                section.category.slug
+              )}`}
+            >
+              <div className="home-collection__image">
+                {image?.image_url && (
+                  <img
+                    src={image.image_url}
+                    alt=""
+                    loading="lazy"
+                  />
+                )}
+              </div>
+              <h3>{section.title}</h3>
+            </Link>
+          );
+        })}
+    </div>
+   </section>
+    )}
       <ProductSection
         title="On Sale"
         products={catalog.on_sale}

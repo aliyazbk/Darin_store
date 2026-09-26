@@ -9,6 +9,8 @@ function ProductInfo({
   selectedVariant,
   onVariantSelect,
   onAddToCart,
+  quantity,
+  onQuantityChange,
 }) {
  const originalPrice = getOriginalPrice(product, selectedVariant);
 const displayedPrice = getFinalPrice(product, selectedVariant);

@@ -39,9 +39,11 @@ export default function OrderSummary({
                   <p>Quantity: {item.quantity}</p>
                 </div>
             
-                <span>
-                  ${(price * Number(item.quantity)).toFixed(2)}
-                </span>
+                  <span>
+                    ${Number(
+                      item.line_total ?? price * Number(item.quantity)
+                    ).toFixed(2)}
+                  </span>
               </div>
             );
           })}

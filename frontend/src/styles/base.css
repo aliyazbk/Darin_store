@@ -6,21 +6,23 @@
   --font-body: "DM Sans", sans-serif;
   --font-display: "Playfair Display", serif;
 
-  --page: #f8f5f2;
-  --paper: #fffdfb;
-  --paper-dark: #f0e9e5;
+--page: #ffffff;
+--paper: #ffffff;
+--paper-dark: #e7ebc5;
 
-  --ink: #24181c;
-  --muted: #776b6f;
+--ink: #242124;
+--muted: #625d60;
 
-  --wine: #842d4b;
-  --wine-dark: #57192f;
-  --wine-soft: #ead2da;
+--wine: #242124;
+--wine-dark: #171517;
+--wine-soft: #fad2e1;
 
-  --line: rgba(62, 35, 44, 0.13);
+--line: #e9e5e7;
 
-  --success: #347159;
-  --danger: #ad334b;
+--success: #347159;
+--danger: #ad334b;
+--accent: #fad2e1;
+--accent-green: #e7ebc5;
 
   --shadow-soft:
     0 12px 35px rgba(54, 28, 37, 0.08);
@@ -141,7 +143,7 @@ button {
   border-radius: 999px;
 
   background: var(--wine);
-  color: #ffffff;
+ color: var(--ink);
 
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -205,3 +207,35 @@ input[type="checkbox"] {
   color: #ffffff;
 }
 
+.store-menu-toggle .menu-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: translate(-50%, -50%);
+  transition: transform 240ms ease, opacity 150ms ease;
+  pointer-events: none;
+}
+
+.store-menu-toggle .menu-line:first-child {
+  transform: translate(-50%, -50%) translateY(-7px);
+}
+
+.store-menu-toggle .menu-line:last-child {
+  transform: translate(-50%, -50%) translateY(7px);
+}
+
+.store-menu-toggle.is-open .menu-line:first-child {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.store-menu-toggle.is-open .menu-line:nth-child(2) {
+  opacity: 0;
+}
+
+.store-menu-toggle.is-open .menu-line:last-child {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}

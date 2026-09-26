@@ -13,3 +13,16 @@ export async function createOrder(orderData) {
 
   return response.data;
 }
+export async function previewOrder(items) {
+  const response = await axios.post(
+    `${API_URL}/orders/preview`,
+    { items },
+    {
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  return response.data.quote;
+}

@@ -56,13 +56,15 @@ export default function Navbar() {
       <div className="store-navbar">
         <button
           type="button"
-          className="store-icon-button"
+          className={`store-icon-button store-menu-toggle ${open ? "is-open" : ""}`}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="store-drawer"
           onClick={() => setOpen((current) => !current)}
         >
-          <span aria-hidden="true">{open ? "×" : "☰"}</span>
+          <span className="menu-line" aria-hidden="true" />
+          <span className="menu-line" aria-hidden="true" />
+          <span className="menu-line" aria-hidden="true" />
         </button>
 
         <Link to="/" className="store-logo" aria-label="Darin Clothet home">

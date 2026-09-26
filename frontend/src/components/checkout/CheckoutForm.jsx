@@ -51,6 +51,8 @@ export default function CheckoutForm({
   errors,
   generalError,
   isSubmitting,
+  buttonText = "Review order",
+
 }) {
   return (
     <form className="checkout-form" onSubmit={onSubmit}>
@@ -109,8 +111,7 @@ export default function CheckoutForm({
         type="submit"
         disabled={isSubmitting}
       >
-        {isSubmitting ? "Placing order..." : "Place cash-on-delivery order"}
-      </button>
+{isSubmitting ? "Checking prices..." : buttonText}      </button>
     </form>
   );
 }

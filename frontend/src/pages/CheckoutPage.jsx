@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import  useCart  from "../hooks/useCart";
+
+import useCart from "../hooks/useCart";
 import useCheckout from "../hooks/useCheckout";
+import { previewOrder } from "../services/checkoutService";
 import CheckoutForm from "../components/checkout/CheckoutForm";
 import OrderSummary from "../components/checkout/OrderSummery";
-import "./../styles/pages/CheckoutPage.css";
+
+import "../styles/pages/CheckoutPage.css";
 
 const initialFormData = {
   customer_name: "",
@@ -17,7 +20,26 @@ const initialFormData = {
   notes: "",
 };
 
-const DELIVERY_FEE = 5;
+function orderItems(cartItems) {
+  return cartItems.map((item) => ({
+    variant_id:
+      item.variant_id ??
+      item.product_variant_id ??
+      item.variantId ??
+      item.variant?.id,
+    quantity: Number(item.quantity),
+  }));
+}
+
+function requestMessage(error) {
+  return (
+    Object.values(error.response?.data?.errors ?? {})
+      .flat()
+      .join(" ") ||
+    error.response?.data?.message ||
+    "Unable to check the current prices."
+  );
+}
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -26,64 +48,69 @@ export default function CheckoutPage() {
     useCheckout();
 
   const [formData, setFormData] = useState(initialFormData);
+  const [quote, setQuote] = useState(null);
+  const [reviewedItems, setReviewedItems] = useState(null);
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewError, setReviewError] = useState("");
 
-  const subtotal = useMemo(() => {
-  return cartItems.reduce((total, item) => {
-    const price = Number(
-      item.unit_price ??
-      item.price ??
-      item.variant?.price ??
-      0
-    );
+  const items = useMemo(
+    () => orderItems(cartItems),
+    [cartItems]
+  );
 
-    return total + price * Number(item.quantity);
-  }, 0);
-}, [cartItems]);
-
-  const total = subtotal + DELIVERY_FEE;
+  const fingerprint = JSON.stringify(items);
+  const quoteIsCurrent =
+    quote && reviewedItems === fingerprint;
 
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData((currentData) => ({
-      ...currentData,
+    setFormData((current) => ({
+      ...current,
       [name]: value,
     }));
   }
 
-  async function handleSubmit(event) {
+  async function handleReview(event) {
     event.preventDefault();
-
-    const orderData = {
-      ...formData,
-
-      // Do not send an empty optional email.
-      email: formData.email.trim() || null,
-
-     items: cartItems.map((item) => ({
-      variant_id:
-        item.variant_id ??
-        item.product_variant_id ??
-        item.variantId ??
-        item.variant?.id,
-    
-      quantity: Number(item.quantity),
-})),
-    };
+    setReviewing(true);
+    setReviewError("");
+    setQuote(null);
 
     try {
-      const createdOrder = await submitOrder(orderData);
+      const nextQuote = await previewOrder(items);
+      setQuote(nextQuote);
+      setReviewedItems(fingerprint);
+    } catch (error) {
+      setReviewError(requestMessage(error));
+    } finally {
+      setReviewing(false);
+    }
+  }
+
+  async function handleConfirm() {
+    if (!quoteIsCurrent) return;
+
+    setReviewError("");
+
+    try {
+      const createdOrder = await submitOrder({
+        ...formData,
+        email: formData.email.trim() || null,
+        customer_note: formData.notes,
+        items,
+        expected_total: quote.total,
+      });
 
       clearCart();
 
       navigate("/order-success", {
         replace: true,
-        state: {
-          order: createdOrder,
-        },
+        state: { order: createdOrder },
       });
-    } catch {
-      // useCheckout already stores the Laravel error messages.
+    } catch (error) {
+      setQuote(null);
+      setReviewError(requestMessage(error));
     }
   }
 
@@ -101,25 +128,60 @@ export default function CheckoutPage() {
     <main className="checkout-page">
       <header className="checkout-header">
         <h1>Checkout</h1>
-        <p>Complete your order and pay when it is delivered.</p>
+        <p>
+          Review the current price before placing your
+          cash-on-delivery order.
+        </p>
       </header>
 
-      <div className="checkout-layout">
-        <CheckoutForm
-          formData={formData}
-          onChange={handleChange}
-          onSubmit={handleSubmit}
-          errors={errors}
-          generalError={generalError}
-          isSubmitting={isSubmitting}
-        />
+      {reviewError && (
+        <div className="checkout-error" role="alert">
+          {reviewError}
+        </div>
+      )}
 
-        <OrderSummary
-          items={cartItems}
-          subtotal={subtotal}
-          deliveryFee={DELIVERY_FEE}
-          total={total}
-        />
+      <div className="checkout-layout">
+        <div>
+          <CheckoutForm
+            formData={formData}
+            onChange={handleChange}
+            onSubmit={handleReview}
+            errors={errors}
+            generalError={generalError}
+            isSubmitting={reviewing}
+            buttonText="Review current prices"
+          />
+
+          {quoteIsCurrent && (
+            <div className="checkout-review" role="status">
+              <h2>Confirm your order</h2>
+              <p>
+                These prices and the delivery fee were
+                calculated by the store.
+              </p>
+
+              <button
+                type="button"
+                className="place-order-button"
+                disabled={isSubmitting}
+                onClick={handleConfirm}
+              >
+                {isSubmitting
+                  ? "Placing order..."
+                  : "Confirm cash-on-delivery order"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {quoteIsCurrent && (
+          <OrderSummary
+            items={quote.items}
+            subtotal={quote.subtotal}
+            deliveryFee={quote.delivery_fee}
+            total={quote.total}
+          />
+        )}
       </div>
     </main>
   );

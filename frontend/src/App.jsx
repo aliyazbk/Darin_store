@@ -57,6 +57,10 @@ export default function App() {
             path="/admin/categories"
             element={<AdminCategoriesPage />}
           />
+          <Route
+            path="/admin/storefront"
+            element={<AdminStorefrontPage />}
+          />
         </Route>
       </Route>
     </Routes>
