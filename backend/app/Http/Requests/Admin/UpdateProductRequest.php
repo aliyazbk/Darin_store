@@ -53,7 +53,7 @@ class UpdateProductRequest extends FormRequest
                 'boolean',
             ],
             'sale_percentage' => [
-             'required',
+             'sometimes',
              'integer',
              'in:0,25,50,75',
                 ],

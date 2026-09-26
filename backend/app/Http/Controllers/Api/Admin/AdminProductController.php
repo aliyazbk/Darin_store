@@ -77,11 +77,12 @@ class AdminProductController extends Controller
 
                 'base_price' =>
                     $validated['base_price'],
+                'sale_percentage' =>
+                     $validated['sale_percentage'] ?? 0,
 
                 'compare_at_price' =>
                     $validated['compare_at_price'] ?? null,
-                'sale_percentage' =>
-                     $validated['sale_percentage'],
+                
 
                 'is_active' =>
                     $validated['is_active'] ?? true,
