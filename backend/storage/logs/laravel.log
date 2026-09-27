@@ -210,3 +210,26 @@
 #52 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php(23): require_once('...')
 #53 {main}
 "} 
+[2026-09-27 01:20:43] production.ERROR: file_get_contents(C:\Projects\Darin-store\backend\.env): Failed to open stream: No such file or directory {"exception":"[object] (ErrorException(code: 0): file_get_contents(C:\\Projects\\Darin-store\\backend\\.env): Failed to open stream: No such file or directory at C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php:105)
+[stacktrace]
+#0 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Bootstrap/HandleExceptions.php(265): Illuminate/Foundation/Bootstrap/HandleExceptions->handleError()
+#1 [internal function]: Illuminate/Foundation/Bootstrap/HandleExceptions->{closure:Illuminate/Foundation/Bootstrap/HandleExceptions::forwardsTo():264}()
+#2 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(105): file_get_contents()
+#3 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(87): Illuminate/Foundation/Console/KeyGenerateCommand->writeNewEnvironmentFileWith()
+#4 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/KeyGenerateCommand.php(52): Illuminate/Foundation/Console/KeyGenerateCommand->setKeyInEnvironmentFile()
+#5 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(36): Illuminate/Foundation/Console/KeyGenerateCommand->handle()
+#6 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Container/Util.php(43): Illuminate/Container/BoundMethod::{closure:Illuminate/Container/BoundMethod::call():35}()
+#7 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(96): Illuminate/Container/Util::unwrapIfClosure()
+#8 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Container/BoundMethod.php(35): Illuminate/Container/BoundMethod::callBoundMethod()
+#9 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Container/Container.php(803): Illuminate/Container/BoundMethod::call()
+#10 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(292): Illuminate/Container/Container->call()
+#11 C:/Projects/Darin-store/backend/vendor/symfony/console/Command/Command.php(285): Illuminate/Console/Command->execute()
+#12 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Console/Command.php(261): Symfony/Component/Console/Command/Command->run()
+#13 C:/Projects/Darin-store/backend/vendor/symfony/console/Application.php(1144): Illuminate/Console/Command->run()
+#14 C:/Projects/Darin-store/backend/vendor/symfony/console/Application.php(379): Symfony/Component/Console/Application->doRunCommand()
+#15 C:/Projects/Darin-store/backend/vendor/symfony/console/Application.php(218): Symfony/Component/Console/Application->doRun()
+#16 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(198): Symfony/Component/Console/Application->run()
+#17 C:/Projects/Darin-store/backend/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1242): Illuminate/Foundation/Console/Kernel->handle()
+#18 C:/Projects/Darin-store/backend/artisan(16): Illuminate/Foundation/Application->handleCommand()
+#19 {main}
+"} 
