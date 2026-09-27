@@ -17,6 +17,16 @@
   object-fit: contain;
 }
 
+/* Below 851px the gallery stacks above the info panel, so size the
+   image from its own width instead of viewport height — a vh-based
+   height looks inconsistent across phone sizes and orientations. */
+@media (max-width: 850px) {
+  .product-gallery__main-image {
+    height: auto;
+    aspect-ratio: 4 / 5;
+  }
+}
+
 .product-gallery__arrow {
   position: absolute;
   top: 50%;
@@ -118,13 +128,9 @@
 }
 
 @media (max-width: 700px) {
-  .product-gallery__main-image {
-    height: 520px;
-  }
-
   .product-gallery__arrow {
-    width: 42px;
-    height: 42px;
+    width: 44px;
+    height: 44px;
   }
 
   .product-gallery__thumbnail {

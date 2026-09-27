@@ -59,6 +59,58 @@
     position: static;
   }
 }
+
+/* Mobile sticky "Add to cart" bar: keeps the CTA reachable without
+   scrolling back up, once the description/variants push it down the
+   page. Hidden on larger screens where the inline button is already
+   visible inside the sticky info panel. */
+.product-mobile-cta {
+  display: none;
+}
+
+@media (max-width: 850px) {
+  .product-info__submit {
+    display: none;
+  }
+
+  .product-mobile-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 0.85rem 1rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: 0 -8px 24px rgba(36, 33, 36, 0.08);
+  }
+
+  .product-mobile-cta__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--color-primary-dark);
+  }
+
+  .product-mobile-cta button {
+    flex: 0 0 auto;
+    min-width: 150px;
+  }
+
+  /* Leave room so the sticky bar never covers the last bit of content,
+     including the related products section further down the page. */
+  .product-details-page {
+    padding-bottom: 88px;
+  }
+}
 .product-quantity {
   width: max-content;
   display: flex;
@@ -78,4 +130,69 @@
 .product-quantity span {
   min-width: 35px;
   text-align: center;
+}
+
+.product-info__stock {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.product-info__stock--low {
+  color: var(--color-danger, #ad334b) !important;
+}
+
+.product-info__trust-badges {
+  display: grid;
+  gap: 0.6rem;
+
+  margin: 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+
+  font-size: 0.85rem;
+  color: var(--color-text-soft);
+}
+
+.product-info__trust-badges li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.product-info__accordion {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.product-info__accordion details {
+  border-bottom: 1px solid var(--color-border);
+  padding-block: 0.9rem;
+}
+
+.product-info__accordion summary {
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.product-info__accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.product-info__accordion summary::after {
+  content: "+";
+  float: right;
+  font-weight: 400;
+}
+
+.product-info__accordion details[open] summary::after {
+  content: "−";
+}
+
+.product-info__accordion p {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.65;
 }

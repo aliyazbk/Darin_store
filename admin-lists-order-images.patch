@@ -1,0 +1,520 @@
+diff --git a/backend/app/Http/Controllers/Api/Admin/AdminOrderController.php b/backend/app/Http/Controllers/Api/Admin/AdminOrderController.php
+index bcc7d77..6373b1d 100644
+--- a/backend/app/Http/Controllers/Api/Admin/AdminOrderController.php
++++ b/backend/app/Http/Controllers/Api/Admin/AdminOrderController.php
+@@ -41,7 +41,7 @@ public function index(Request $request): JsonResponse
+ 
+     public function show(Order $order): JsonResponse
+     {
+-        $order->load('items');
++        $order->load('items.productVariant.product.images');
+ 
+         return response()->json([
+             'order' => $order,
+@@ -77,7 +77,7 @@ public function updateStatus(
+     if ($newStatus === $order->status) {
+         return response()->json([
+             'message' => 'The order already has this status.',
+-            'order' => $order->load('items'),
++            'order' => $order->load('items.productVariant.product.images'),
+         ]);
+     }
+ 
+@@ -116,7 +116,7 @@ public function updateStatus(
+             'status' => $newStatus,
+         ]);
+ 
+-        return $lockedOrder->fresh('items');
++        return $lockedOrder->fresh('items.productVariant.product.images');
+     });
+ 
+     return response()->json([
+@@ -124,4 +124,4 @@ public function updateStatus(
+         'order' => $updatedOrder,
+     ]);
+ }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/app/Models/OrderItem.php b/backend/app/Models/OrderItem.php
+index 595bfc9..693dd76 100644
+--- a/backend/app/Models/OrderItem.php
++++ b/backend/app/Models/OrderItem.php
+@@ -11,6 +11,7 @@ class OrderItem extends Model
+         'order_id',
+         'product_varient_id',
+         'product_name',
++        'image_path',
+         'sku',
+         'size',
+         'color',
+@@ -29,6 +30,27 @@ protected function casts(): array
+         ];
+     }
+ 
++    protected $appends = ['image_url'];
++
++    public function getImageUrlAttribute(): ?string
++    {
++        if ($this->image_path) {
++            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image_path);
++        }
++
++        // Older orders did not save a photo. Use the current product photo when available.
++        if (! $this->relationLoaded('productVariant')) {
++            return null;
++        }
++
++        $product = $this->productVariant?->product;
++        $image = $product?->images
++            ?->first(fn ($image) => $image->color && strcasecmp($image->color, $this->color ?? '') === 0)
++            ?? $product?->images?->first();
++
++        return $image?->image_url;
++    }
++
+     public function order(): BelongsTo
+     {
+         return $this->belongsTo(Order::class);
+@@ -41,4 +63,4 @@ public function productVariant(): BelongsTo
+         'product_varient_id'
+     );
+ }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/app/Services/OrderService.php b/backend/app/Services/OrderService.php
+index 222968b..f846768 100644
+--- a/backend/app/Services/OrderService.php
++++ b/backend/app/Services/OrderService.php
+@@ -20,7 +20,7 @@ private function priceItems(array $items, bool $lock = false): array
+         $requestedItems = collect($items);
+ 
+         $query = ProductVarient::query()
+-            ->with('product.category')
++            ->with(['product.category', 'product.images'])
+             ->whereIn('id', $requestedItems->pluck('variant_id'));
+ 
+         $variants = ($lock ? $query->lockForUpdate() : $query)
+@@ -63,8 +63,11 @@ private function priceItems(array $items, bool $lock = false): array
+             $subtotal += $lineTotal;
+ 
+             $calculatedItems[] = [
+-                'product_variant_id' => $variant->id,
++                'product_varient_id' => $variant->id,
+                 'product_name' => $variant->product->name,
++                'image_path' => ($variant->product->images
++                    ->first(fn ($image) => $image->color && strcasecmp($image->color, $variant->color ?? '') === 0)
++                    ?? $variant->product->images->first())?->image_path,
+                 'sku' => $variant->sku,
+                 'size' => $variant->size,
+                 'color' => $variant->color,
+@@ -123,11 +126,11 @@ public function create(array $data): Order
+             $order->items()->createMany($quote['items']);
+ 
+             foreach ($quote['items'] as $item) {
+-                ProductVarient::whereKey($item['product_variant_id'])
++                ProductVarient::whereKey($item['product_varient_id'])
+                     ->decrement('stock_quantity', $item['quantity']);
+             }
+ 
+             return $order->load('items');
+         });
+     }
+-}
+\ No newline at end of file
++}
+diff --git a/backend/database/migrations/2026_09_27_000001_add_image_path_to_order_items_table.php b/backend/database/migrations/2026_09_27_000001_add_image_path_to_order_items_table.php
+new file mode 100644
+index 0000000..5ff9c9c
+--- /dev/null
++++ b/backend/database/migrations/2026_09_27_000001_add_image_path_to_order_items_table.php
+@@ -0,0 +1,21 @@
++<?php
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration {
++    public function up(): void
++    {
++        Schema::table('order_items', function (Blueprint $table) {
++            $table->string('image_path')->nullable();
++        });
++    }
++
++    public function down(): void
++    {
++        Schema::table('order_items', function (Blueprint $table) {
++            $table->dropColumn('image_path');
++        });
++    }
++};
+diff --git a/frontend/src/pages/admin/AdminOrderDetailsPage.jsx b/frontend/src/pages/admin/AdminOrderDetailsPage.jsx
+index ca1ab49..d1508cc 100644
+--- a/frontend/src/pages/admin/AdminOrderDetailsPage.jsx
++++ b/frontend/src/pages/admin/AdminOrderDetailsPage.jsx
+@@ -107,11 +107,10 @@ export default function AdminOrderDetailsPage() {
+       <section>
+         <h2>Items</h2>
+ 
+-        <table>
++        <table className="admin-list-table admin-order-items-table">
+           <thead>
+             <tr>
+               <th>Product</th>
+-              <th>SKU</th>
+               <th>Variant</th>
+               <th>Price</th>
+               <th>Quantity</th>
+@@ -122,20 +121,26 @@ export default function AdminOrderDetailsPage() {
+           <tbody>
+             {order.items.map((item) => (
+               <tr key={item.id}>
+-                <td>{item.product_name}</td>
+-                <td>{item.sku}</td>
++                <td data-label="Product" className="admin-list-table__primary">
++                  <div className="admin-product-identity">
++                    {item.image_url ? (
++                      <img src={item.image_url} alt={item.product_name} loading="lazy" />
++                    ) : <span className="admin-image-placeholder" aria-hidden="true">No photo</span>}
++                    <strong>{item.product_name}</strong>
++                  </div>
++                </td>
+ 
+-                <td>
+-                  {item.size} / {item.color}
++                <td data-label="Variant">
++                  {[item.size, item.color].filter(Boolean).join(" / ") || "—"}
+                 </td>
+ 
+-                <td>
++                <td data-label="Price">
+                   {formatCurrency(item.unit_price)}
+                 </td>
+ 
+-                <td>{item.quantity}</td>
++                <td data-label="Quantity">{item.quantity}</td>
+ 
+-                <td>
++                <td data-label="Total">
+                   {formatCurrency(item.line_total)}
+                 </td>
+               </tr>
+@@ -168,4 +173,4 @@ export default function AdminOrderDetailsPage() {
+       </section>
+     </main>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/src/pages/admin/AdminOrdersPage.jsx b/frontend/src/pages/admin/AdminOrdersPage.jsx
+index ebc6fcc..6d40258 100644
+--- a/frontend/src/pages/admin/AdminOrdersPage.jsx
++++ b/frontend/src/pages/admin/AdminOrdersPage.jsx
+@@ -98,7 +98,7 @@ export default function AdminOrdersPage() {
+       {!loading &&
+         !error &&
+         orders.length > 0 && (
+-          <table>
++          <table className="admin-list-table">
+             <thead>
+               <tr>
+                 <th>Order</th>
+@@ -114,12 +114,12 @@ export default function AdminOrdersPage() {
+             <tbody>
+               {orders.map((order) => (
+                 <tr key={order.id}>
+-                  <td>
++                  <td data-label="Order" className="admin-list-table__primary">
+                     {order.order_number ??
+                       `#${order.id}`}
+                   </td>
+ 
+-                  <td>
++                  <td data-label="Customer">
+                     <strong>
+                       {order.customer_name}
+                     </strong>
+@@ -127,22 +127,23 @@ export default function AdminOrdersPage() {
+                     {order.phone}
+                   </td>
+ 
+-                  <td>{order.items_count}</td>
++                  <td data-label="Items">{order.items_count}</td>
+ 
+-                  <td>
++                  <td data-label="Total">
+                     {formatCurrency(order.total)}
+                   </td>
+ 
+-                  <td>{order.status}</td>
++                  <td data-label="Status"><span className={`admin-status admin-status--${order.status}`}>{order.status}</span></td>
+ 
+-                  <td>
++                  <td data-label="Date">
+                     {new Date(
+                       order.created_at
+                     ).toLocaleDateString()}
+                   </td>
+ 
+-                  <td>
++                  <td data-label="Action" className="admin-list-table__action">
+                     <Link
++                      className="admin-list-action"
+                       to={`/admin/orders/${order.id}`}
+                     >
+                       View
+@@ -186,4 +187,4 @@ export default function AdminOrdersPage() {
+       )}
+     </main>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/src/pages/admin/AdminProductsPage.jsx b/frontend/src/pages/admin/AdminProductsPage.jsx
+index c2d16ce..ebf9d6e 100644
+--- a/frontend/src/pages/admin/AdminProductsPage.jsx
++++ b/frontend/src/pages/admin/AdminProductsPage.jsx
+@@ -78,7 +78,7 @@ export default function AdminProductsPage() {
+       {!loading &&
+         !error &&
+         products.length > 0 && (
+-          <table>
++          <table className="admin-list-table">
+             <thead>
+               <tr>
+                 <th>Product</th>
+@@ -93,30 +93,38 @@ export default function AdminProductsPage() {
+             <tbody>
+               {products.map((product) => (
+                 <tr key={product.id} className="product-row">
+-                  <td>{product.name}</td>
++                  <td data-label="Product" className="admin-list-table__primary">
++                    <div className="admin-product-identity">
++                      {product.images?.[0]?.image_url ? (
++                        <img src={product.images[0].image_url} alt="" loading="lazy" />
++                      ) : <span className="admin-image-placeholder" aria-hidden="true">No photo</span>}
++                      <strong>{product.name}</strong>
++                    </div>
++                  </td>
+ 
+-                  <td>
++                  <td data-label="Category">
+                     {product.category?.name ?? "—"}
+                   </td>
+ 
+-                  <td>
++                  <td data-label="Price">
+                     ${Number(
+                       product.base_price
+                     ).toFixed(2)}
+                   </td>
+ 
+-                  <td>
++                  <td data-label="Variants">
+                     {product.variants?.length ?? 0}
+                   </td>
+ 
+-                  <td>
+-                    {product.is_active
+-                      ? "Active"
+-                      : "Inactive"}
++                  <td data-label="Status">
++                    <span className={`admin-status admin-status--${product.is_active ? "active" : "inactive"}`}>
++                      {product.is_active ? "Active" : "Inactive"}
++                    </span>
+                   </td>
+ 
+-                  <td>
++                  <td data-label="Action" className="admin-list-table__action">
+                     <Link
++                      className="admin-list-action"
+                       to={`/admin/products/${product.id}`}
+                     >
+                       Manage
+@@ -160,4 +168,4 @@ export default function AdminProductsPage() {
+       )}
+     </main>
+   );
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/src/styles/admin/AdminPages.css b/frontend/src/styles/admin/AdminPages.css
+index d9fbbbc..ed43c11 100644
+--- a/frontend/src/styles/admin/AdminPages.css
++++ b/frontend/src/styles/admin/AdminPages.css
+@@ -97,6 +97,100 @@
+   font-weight: 700;
+ }
+ 
++.admin-list-table {
++  width: 100%;
++  border-collapse: separate;
++  border-spacing: 0;
++  overflow: hidden;
++  background: var(--color-surface);
++}
++
++.admin-list-table th,
++.admin-list-table td {
++  padding: 1rem;
++  text-align: left;
++  vertical-align: middle;
++  border-bottom: 1px solid var(--color-border);
++}
++
++.admin-list-table th {
++  background: var(--color-surface-soft);
++  color: var(--color-text-soft);
++  font-size: 0.78rem;
++  letter-spacing: 0.07em;
++  text-transform: uppercase;
++}
++
++.admin-list-table tr:last-child td { border-bottom: 0; }
++.admin-list-table__primary { font-weight: 700; }
++.admin-list-table__action { text-align: right !important; }
++
++.admin-product-identity {
++  display: flex;
++  align-items: center;
++  gap: 0.85rem;
++  min-width: 0;
++}
++
++.admin-product-identity strong { overflow-wrap: anywhere; }
++.admin-product-identity img,
++.admin-image-placeholder {
++  flex: none;
++  width: 58px;
++  height: 68px;
++  border-radius: 8px;
++  object-fit: cover;
++  background: var(--color-surface-soft);
++}
++
++.admin-image-placeholder {
++  display: grid;
++  place-items: center;
++  padding: 0.3rem;
++  color: var(--color-text-soft);
++  font-size: 0.65rem;
++  text-align: center;
++}
++
++.admin-content td .admin-list-action {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  min-height: 38px;
++  padding: 0.5rem 0.9rem;
++  border: 1px solid var(--color-primary);
++  border-radius: var(--radius-small);
++  color: var(--color-primary-dark);
++  white-space: nowrap;
++}
++
++.admin-content td .admin-list-action:hover {
++  background: var(--color-primary);
++  color: #fff;
++}
++
++.admin-status {
++  display: inline-block;
++  padding: 0.35rem 0.7rem;
++  border-radius: 999px;
++  background: var(--color-surface-soft);
++  font-size: 0.8rem;
++  font-weight: 700;
++  text-transform: capitalize;
++  white-space: nowrap;
++}
++
++.admin-status--active, .admin-status--delivered, .admin-status--confirmed {
++  background: #e5f5eb;
++  color: #17623a;
++}
++.admin-status--pending { background: #fff2d9; color: #80500b; }
++.admin-status--shipped { background: #e5efff; color: #244f92; }
++.admin-status--inactive, .admin-status--cancelled {
++  background: #fbe9e9;
++  color: #9b3030;
++}
++
+ .admin-content nav[aria-label$="pages"] {
+   display: flex;
+   align-items: center;
+@@ -228,6 +322,64 @@
+     white-space: nowrap;
+   }
+ 
++  .admin-content .admin-list-table {
++    display: block;
++    overflow: visible;
++    border: 0;
++    background: transparent;
++    box-shadow: none;
++    white-space: normal;
++  }
++
++  .admin-list-table thead { display: none; }
++  .admin-list-table tbody { display: grid; gap: 1rem; }
++  .admin-list-table tr {
++    display: grid;
++    min-width: 0;
++    padding: 0.4rem 1rem;
++    border: 1px solid var(--color-border);
++    border-radius: var(--radius-medium);
++    background: var(--color-surface);
++    box-shadow: var(--shadow-small);
++  }
++
++  .admin-list-table td,
++  .admin-list-table tr:last-child td {
++    display: flex;
++    justify-content: space-between;
++    align-items: center;
++    gap: 1rem;
++    min-width: 0;
++    padding: 0.8rem 0;
++    border-bottom: 1px solid var(--color-border);
++    text-align: right;
++    overflow-wrap: anywhere;
++  }
++
++  .admin-list-table td::before {
++    content: attr(data-label);
++    flex: none;
++    color: var(--color-text-soft);
++    font-size: 0.8rem;
++    font-weight: 600;
++    text-align: left;
++  }
++
++  .admin-list-table td.admin-list-table__primary {
++    align-items: flex-start;
++    flex-direction: column;
++    gap: 0.35rem;
++    text-align: left;
++  }
++
++  .admin-list-table td.admin-list-table__action {
++    border-bottom: 0;
++  }
++
++  .admin-list-table__action .admin-list-action {
++    flex: 1;
++  }
++
+   .admin-content main > form {
+     align-items: stretch;
+     flex-direction: column;
+@@ -338,4 +490,4 @@
+   .admin-home-section-row {
+     grid-template-columns: 1fr 1fr;
+   }
+-}
+\ No newline at end of file
++}

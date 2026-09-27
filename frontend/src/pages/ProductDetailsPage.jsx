@@ -1,11 +1,11 @@
 import { useEffect,useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./../styles/pages/ProductDetailPage.css";
-//import useProduct from "../hooks/useProducts";
 import useCart from "../hooks/useCart";
 import useProduct from "../hooks/useProduct";
 import ProductGallery from "../components/Products/ProductGallery";
 import ProductInfo from "../components/Products/ProductInfo";
+import RelatedProducts from "../components/Products/RelatedProducts";
 import LoadingMessage from "../components/ui/LoadingMessage";
 import ErrorMessage from "../components/ui/ErrorMessage";
 
@@ -65,20 +65,21 @@ addItem(product, selectedVariant, quantity);
   }
 
   return (
-    <div className="product-details">
-     <ProductGallery
-  images={visibleImages}
-  productName={product.name}
-/>
+    <div className="product-details-page">
+      <div className="product-details">
+        <ProductGallery images={visibleImages} productName={product.name} />
 
-      <ProductInfo
-        product={product}
-        selectedVariant={selectedVariant}
-        onVariantSelect={setSelectedVariant}
-        onAddToCart={handleAddToCart}
-        quantity={quantity}
-        onQuantityChange={setQuantity}
-      />
+        <ProductInfo
+          product={product}
+          selectedVariant={selectedVariant}
+          onVariantSelect={setSelectedVariant}
+          onAddToCart={handleAddToCart}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+        />
+      </div>
+
+      <RelatedProducts product={product} />
     </div>
   );
 }
