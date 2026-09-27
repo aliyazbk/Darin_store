@@ -24,14 +24,21 @@ const [quantity, setQuantity] = useState(1);
     return images;
   }
 
-  const matchingImages = images.filter(
-    (image) =>
-      !image.color ||
-      image.color === selectedVariant.color
+  const colorImages = images.filter(
+    (image) => image.color === selectedVariant.color
   );
 
-  return matchingImages.length > 0
-    ? matchingImages
+  const generalImages = images.filter(
+    (image) => !image.color
+  );
+
+  // Color-specific photos come first so the gallery's main
+  // image (always index 0) actually shows the selected
+  // color, with the general shots available right after.
+  const orderedImages = [...colorImages, ...generalImages];
+
+  return orderedImages.length > 0
+    ? orderedImages
     : images;
 }, [product, selectedVariant]);
 

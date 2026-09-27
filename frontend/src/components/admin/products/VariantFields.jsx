@@ -1,3 +1,5 @@
+import { PRODUCT_COLORS } from "../../../constants/productColors";
+
 const emptyVariant = {
   size: "",
   color: "",
@@ -56,14 +58,21 @@ export default function VariantFields({ variants, onChange }) {
 
           <label>
             Color
-            <input
-              type="text"
+            <select
               value={variant.color}
               onChange={(event) =>
                 updateVariant(index, "color", event.target.value)
               }
               required
-            />
+            >
+              <option value="">Select a color</option>
+
+              {PRODUCT_COLORS.map((colorOption) => (
+                <option key={colorOption} value={colorOption}>
+                  {colorOption}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label>

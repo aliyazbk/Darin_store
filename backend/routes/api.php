@@ -83,6 +83,11 @@ Route::prefix('admin')->group(function () {
                 'logout',
             ]);
 
+            Route::put('/password', [
+                AdminAuthController::class,
+                'changePassword',
+            ]);
+
             // Dashboard
             Route::get('/dashboard', [
                 AdminDashboardController::class,

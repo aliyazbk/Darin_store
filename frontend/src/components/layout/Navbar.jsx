@@ -178,6 +178,7 @@ export default function Navbar() {
             <NavLink to="/admin/categories">Categories</NavLink>
             <NavLink to="/admin/orders">Orders</NavLink>
             <NavLink to="/admin/storefront">Storefront settings</NavLink>
+            <NavLink to="/admin/password">Change password</NavLink>
             <button type="button" onClick={handleLogout}>
               Logout
             </button>

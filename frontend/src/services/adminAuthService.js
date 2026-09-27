@@ -20,3 +20,13 @@ export async function logoutAdmin() {
 
   return response.data;
 }
+
+export async function changeAdminPassword(passwordData) {
+  const response = await api.put("/admin/password", {
+    current_password: passwordData.currentPassword,
+    password: passwordData.newPassword,
+    password_confirmation: passwordData.confirmPassword,
+  });
+
+  return response.data;
+}

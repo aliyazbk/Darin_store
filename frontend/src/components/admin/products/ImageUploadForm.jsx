@@ -1,7 +1,8 @@
 import { useState } from "react";
 
+import { PRODUCT_COLORS } from "../../../constants/productColors";
+
 export default function ImageUploadForm({
-  colors,
   submitting,
   onSubmit,
 }) {
@@ -56,7 +57,7 @@ export default function ImageUploadForm({
             General product image
           </option>
 
-          {colors.map((availableColor) => (
+          {PRODUCT_COLORS.map((availableColor) => (
             <option
               key={availableColor}
               value={availableColor}

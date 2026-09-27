@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductImageRequest;
+use App\Http\Requests\Admin\UpdateProductImageRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,24 @@ class AdminProductImageController extends Controller
             'image' => $image,
         ], 201);
     }
+    public function update(
+        UpdateProductImageRequest $request,
+        Product $product,
+        ProductImage $image
+    ): JsonResponse {
+        abort_if(
+            $image->product_id !== $product->id,
+            404
+        );
+
+        $image->update($request->validated());
+
+        return response()->json([
+            'message' => 'Product image updated successfully.',
+            'image' => $image->fresh(),
+        ]);
+    }
+
     public function setPrimary(
     Product $product,
     ProductImage $image

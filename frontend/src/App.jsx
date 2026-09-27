@@ -21,6 +21,7 @@ import AdminOrderDetailsPage from "./pages/admin/AdminOrderDetailsPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
 import AboutPage from "./pages/AboutPage";
 import AdminStorefrontPage from "./pages/admin/AdminStorefrontPage";
+import AdminChangePasswordPage from "./pages/admin/AdminChangePasswordPage";
 export default function App() {
   return (
     <Routes>
@@ -61,6 +62,10 @@ export default function App() {
           <Route
             path="/admin/storefront"
             element={<AdminStorefrontPage />}
+          />
+          <Route
+            path="/admin/password"
+            element={<AdminChangePasswordPage />}
           />
         </Route>
       </Route>

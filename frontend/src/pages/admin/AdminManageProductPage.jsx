@@ -47,14 +47,6 @@ export default function AdminManageProductPage() {
       <ErrorMessage message="Product not found." />
     );
   }
-  const productColors = [
-  ...new Set(
-    (product.variants ?? [])
-      .map((variant) => variant.color)
-      .filter(Boolean)
-  ),
-];
-
   return (
     <main className="admin-manage-product-page">
       <header>
@@ -82,12 +74,12 @@ export default function AdminManageProductPage() {
      <VariantManager
         productId={product.id}
         variants={product.variants ?? []}
+        images={product.images ?? []}
         onUpdated={refresh}
       />
       <ImageManager
          productId={product.id}
          images={product.images ?? []}
-         colors={productColors}
          onUpdated={refresh}
       />
     </main>

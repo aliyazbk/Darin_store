@@ -1,17 +1,20 @@
 import { useState } from "react";
 
 import VariantForm from "./VariantForm";
+import QuickColorImageUpload from "./QuickColorImageUpload";
 import ErrorMessage from "../../ui/ErrorMessage";
 
 import {
   createProductVariant,
   deactivateProductVariant,
   updateProductVariant,
+  uploadProductImage,
 } from "../../../services/adminProductService";
 
 export default function VariantManager({
   productId,
   variants,
+  images = [],
   onUpdated,
 }) {
   const [action, setAction] = useState("");
@@ -20,6 +23,34 @@ export default function VariantManager({
   const [editingId, setEditingId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newFormKey, setNewFormKey] = useState(0);
+
+  const colorsWithoutSwatch = [
+    ...new Set(
+      variants
+        .filter((variant) => variant.is_active)
+        .map((variant) => variant.color)
+        .filter(Boolean)
+    ),
+  ].filter(
+    (color) => !images.some((image) => image.color === color)
+  );
+
+  async function handleQuickImageUpload(imageData) {
+    try {
+      setAction(`swatch-${imageData.color}`);
+      setError("");
+      setSuccess("");
+
+      await uploadProductImage(productId, imageData);
+
+      setSuccess(`Photo added for ${imageData.color}.`);
+      onUpdated();
+    } catch (requestError) {
+      handleError(requestError);
+    } finally {
+      setAction("");
+    }
+  }
 
   function handleError(requestError) {
     console.error("Variant request failed:", requestError);
@@ -101,6 +132,25 @@ export default function VariantManager({
 
       {success && <p role="status">{success}</p>}
       {error && <ErrorMessage message={error} />}
+
+      {colorsWithoutSwatch.length > 0 && (
+        <div role="alert">
+          <p>
+            These colors have no swatch photo yet, so
+            shoppers will see a plain letter icon instead:
+          </p>
+
+          {colorsWithoutSwatch.map((color) => (
+            <div key={color}>
+              <QuickColorImageUpload
+                color={color}
+                submitting={action === `swatch-${color}`}
+                onSubmit={handleQuickImageUpload}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       {variants.length === 0 && (
         <p>No sizes or colors have been added yet.</p>

@@ -127,3 +127,15 @@ export async function deleteProductImage(
 
   return response.data;
 }
+export async function updateProductImage(
+  productId,
+  imageId,
+  imageData
+) {
+  const response = await api.patch(
+    `/admin/products/${productId}/images/${imageId}`,
+    { color: imageData.color || null }
+  );
+
+  return response.data;
+}

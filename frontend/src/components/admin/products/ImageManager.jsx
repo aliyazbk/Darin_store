@@ -6,13 +6,14 @@ import ErrorMessage from "../../ui/ErrorMessage";
 import {
   deleteProductImage,
   setPrimaryProductImage,
+  updateProductImage,
   uploadProductImage,
 } from "../../../services/adminProductService";
+import { PRODUCT_COLORS } from "../../../constants/productColors";
 
 export default function ImageManager({
   productId,
   images,
-  colors,
   onUpdated,
 }) {
   const [action, setAction] = useState("");
@@ -49,6 +50,25 @@ export default function ImageManager({
 
       setSuccess("Image uploaded successfully.");
       setUploadKey((key) => key + 1);
+      onUpdated();
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setAction("");
+    }
+  }
+
+  async function handleColorChange(imageId, color) {
+    try {
+      setAction(`color-${imageId}`);
+      setError("");
+      setSuccess("");
+
+      await updateProductImage(productId, imageId, {
+        color,
+      });
+
+      setSuccess("Image color updated.");
       onUpdated();
     } catch (error) {
       handleError(error);
@@ -131,6 +151,30 @@ export default function ImageManager({
                 : `Display order: ${image.display_order}`}
             </p>
 
+            <label>
+              Used for color
+              <select
+                value={image.color ?? ""}
+                disabled={action === `color-${image.id}`}
+                onChange={(event) =>
+                  handleColorChange(
+                    image.id,
+                    event.target.value || null
+                  )
+                }
+              >
+                <option value="">
+                  General product image
+                </option>
+
+                {PRODUCT_COLORS.map((colorOption) => (
+                  <option key={colorOption} value={colorOption}>
+                    {colorOption}
+                  </option>
+                ))}
+              </select>
+            </label>
+
             {!image.is_primary && (
               <button
                 type="button"
@@ -164,7 +208,6 @@ export default function ImageManager({
 
     <ImageUploadForm
   key={uploadKey}
-  colors={colors}
   submitting={action === "upload"}
   onSubmit={handleUpload}
 />

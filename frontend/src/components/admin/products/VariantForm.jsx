@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { PRODUCT_COLORS } from "../../../constants/productColors";
+
 export default function VariantForm({
   initialVariant = null,
   submitLabel = "Save option",
@@ -52,12 +54,20 @@ export default function VariantForm({
 
       <label>
         Color
-        <input
+        <select
           name="color"
           value={variant.color}
           onChange={handleChange}
           required
-        />
+        >
+          <option value="">Select a color</option>
+
+          {PRODUCT_COLORS.map((colorOption) => (
+            <option key={colorOption} value={colorOption}>
+              {colorOption}
+            </option>
+          ))}
+        </select>
       </label>
 
       <label>
