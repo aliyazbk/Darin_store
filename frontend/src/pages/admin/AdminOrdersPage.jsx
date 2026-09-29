@@ -117,6 +117,11 @@ export default function AdminOrdersPage() {
                   <td>
                     {order.order_number ??
                       `#${order.id}`}
+                       <Link
+                      to={`/admin/orders/${order.id}`}
+                    >
+                      View
+                    </Link>
                   </td>
 
                   <td>
@@ -141,13 +146,7 @@ export default function AdminOrdersPage() {
                     ).toLocaleDateString()}
                   </td>
 
-                  <td>
-                    <Link
-                      to={`/admin/orders/${order.id}`}
-                    >
-                      View
-                    </Link>
-                  </td>
+               
                 </tr>
               ))}
             </tbody>

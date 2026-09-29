@@ -439,3 +439,21 @@
     white-space: nowrap;
   }
 }
+.mobile-row-action {
+  display: none;
+}
+
+@media (max-width: 560px) {
+  .admin-products-page .product-row td:first-child .mobile-row-action {
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small);
+  }
+
+  .admin-products-page .product-row td:last-child {
+    display: none;
+  }
+}

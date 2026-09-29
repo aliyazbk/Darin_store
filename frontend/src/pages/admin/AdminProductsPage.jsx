@@ -93,7 +93,15 @@ export default function AdminProductsPage() {
             <tbody>
               {products.map((product) => (
                 <tr key={product.id} className="product-row">
-                  <td>{product.name}</td>
+                  <td>
+                    {product.name}
+                    <Link
+                      className="mobile-row-action"
+                      to={`/admin/products/${product.id}`}
+                    >
+                      Manage
+                    </Link>
+                  </td>
 
                   <td>
                     {product.category?.name ?? "—"}
@@ -115,13 +123,7 @@ export default function AdminProductsPage() {
                       : "Inactive"}
                   </td>
 
-                  <td>
-                    <Link
-                      to={`/admin/products/${product.id}`}
-                    >
-                      Manage
-                    </Link>
-                  </td>
+
                 </tr>
               ))}
             </tbody>
