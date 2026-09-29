@@ -277,10 +277,7 @@
     min-height: 410px;
   }
 
-  .home-hero-content {
-    width: calc(100% - 2.5rem);
-    padding: 1rem ;
-  }
+
 
   .home-hero-content h1 {
     font-size: clamp(2.7rem, 11vw, 4rem);
