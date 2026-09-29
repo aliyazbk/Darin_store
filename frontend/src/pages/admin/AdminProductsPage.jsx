@@ -123,7 +123,13 @@ export default function AdminProductsPage() {
                       : "Inactive"}
                   </td>
 
-
+                  <td>
+                    <Link
+                      to={`/admin/products/${product.id}`}
+                    >
+                      Manage
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
