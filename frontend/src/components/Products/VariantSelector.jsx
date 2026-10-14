@@ -64,6 +64,7 @@ export default function VariantSelector({
                 }
                 onClick={() => selectColor(color)}
                 aria-pressed={isSelected}
+                aria-label={color}
                 title={color}
               >
                 <span className="variant-selector__swatch-thumb">
@@ -74,9 +75,6 @@ export default function VariantSelector({
                       {color.charAt(0).toUpperCase()}
                     </span>
                   )}
-                </span>
-                <span className="variant-selector__swatch-label">
-                  {color}
                 </span>
               </button>
             );

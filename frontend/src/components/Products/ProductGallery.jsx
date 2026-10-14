@@ -1,9 +1,15 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 
 import "../../styles/components/ProductGallery.css";
+
+// Minimum horizontal finger movement (in pixels) before a touch
+// gesture counts as an intentional swipe rather than a light tap
+// or an accidental wobble.
+const SWIPE_THRESHOLD = 40;
 
 export default function ProductGallery({
   images = [],
@@ -11,6 +17,7 @@ export default function ProductGallery({
 }) {
   const [selectedIndex, setSelectedIndex] =
     useState(0);
+  const touchStartX = useRef(null);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -43,12 +50,46 @@ export default function ProductGallery({
     );
   }
 
+  function handleTouchStart(event) {
+    touchStartX.current = event.touches[0].clientX;
+  }
+
+  function handleTouchEnd(event) {
+    if (touchStartX.current === null) {
+      return;
+    }
+
+    const deltaX =
+      event.changedTouches[0].clientX -
+      touchStartX.current;
+
+    touchStartX.current = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
+      return;
+    }
+
+    if (deltaX < 0) {
+      showNext();
+    } else {
+      showPrevious();
+    }
+  }
+
   return (
     <section
       className="product-gallery"
       aria-label={`${productName} images`}
     >
-      <div className="product-gallery__main">
+      <div
+        className="product-gallery__main"
+        onTouchStart={
+          images.length > 1 ? handleTouchStart : undefined
+        }
+        onTouchEnd={
+          images.length > 1 ? handleTouchEnd : undefined
+        }
+      >
         <img
           src={selectedImage.image_url}
           alt={
@@ -59,54 +100,11 @@ export default function ProductGallery({
         />
 
         {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="product-gallery__arrow product-gallery__arrow--previous"
-              onClick={showPrevious}
-              aria-label="Previous image"
-            >
-              ‹
-            </button>
-
-            <button
-              type="button"
-              className="product-gallery__arrow product-gallery__arrow--next"
-              onClick={showNext}
-              aria-label="Next image"
-            >
-              ›
-            </button>
-
-            <span className="product-gallery__counter">
-              {selectedIndex + 1} / {images.length}
-            </span>
-          </>
+          <span className="product-gallery__counter">
+            {selectedIndex + 1} / {images.length}
+          </span>
         )}
       </div>
-
-      {images.length > 1 && (
-        <div className="product-gallery__thumbnails">
-          {images.map((image, index) => (
-            <button
-              key={image.id}
-              type="button"
-              className={
-                index === selectedIndex
-                  ? "product-gallery__thumbnail selected"
-                  : "product-gallery__thumbnail"
-              }
-              onClick={() => setSelectedIndex(index)}
-              aria-label={`Show image ${index + 1}`}
-            >
-              <img
-                src={image.image_url}
-                alt=""
-              />
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

@@ -33,8 +33,8 @@ const [quantity, setQuantity] = useState(1);
   );
 
   // Color-specific photos come first so the gallery's main
-  // image (always index 0) actually shows the selected
-  // color, with the general shots available right after.
+  // image (always index 0) actually shows the selected color,
+  // with the general shots available right after.
   const orderedImages = [...colorImages, ...generalImages];
 
   return orderedImages.length > 0
