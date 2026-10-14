@@ -13,15 +13,26 @@ const SWIPE_THRESHOLD = 40;
 
 export default function ProductGallery({
   images = [],
+  jumpToIndex,
   productName,
 }) {
   const [selectedIndex, setSelectedIndex] =
-    useState(0);
+    useState(jumpToIndex ?? 0);
   const touchStartX = useRef(null);
 
+  // Only snap to a new photo when the requested index actually
+  // changes (i.e. a different color was picked) — this never
+  // fires just because the user swiped or clicked a thumbnail.
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [images]);
+    if (
+      typeof jumpToIndex === "number" &&
+      jumpToIndex >= 0 &&
+      jumpToIndex < images.length
+    ) {
+      setSelectedIndex(jumpToIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jumpToIndex]);
 
   if (images.length === 0) {
     return (
@@ -100,11 +111,50 @@ export default function ProductGallery({
         />
 
         {images.length > 1 && (
-          <span className="product-gallery__counter">
-            {selectedIndex + 1} / {images.length}
-          </span>
+          <>
+            <button
+              type="button"
+              className="product-gallery__arrow product-gallery__arrow--previous"
+              onClick={showPrevious}
+              aria-label="Previous image"
+            >
+              ‹
+            </button>
+
+            <button
+              type="button"
+              className="product-gallery__arrow product-gallery__arrow--next"
+              onClick={showNext}
+              aria-label="Next image"
+            >
+              ›
+            </button>
+          </>
         )}
       </div>
+
+      {images.length > 1 && (
+        <div className="product-gallery__thumbnails">
+          {images.map((image, index) => (
+            <button
+              key={image.id}
+              type="button"
+              className={
+                index === selectedIndex
+                  ? "product-gallery__thumbnail selected"
+                  : "product-gallery__thumbnail"
+              }
+              onClick={() => setSelectedIndex(index)}
+              aria-label={`Show image ${index + 1}`}
+            >
+              <img
+                src={image.image_url}
+                alt=""
+              />
+            </button>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

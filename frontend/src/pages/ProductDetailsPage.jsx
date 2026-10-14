@@ -1,4 +1,4 @@
-import { useEffect,useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./../styles/pages/ProductDetailPage.css";
 import useCart from "../hooks/useCart";
@@ -9,6 +9,26 @@ import RelatedProducts from "../components/Products/RelatedProducts";
 import LoadingMessage from "../components/ui/LoadingMessage";
 import ErrorMessage from "../components/ui/ErrorMessage";
 
+// Finds which image in the full gallery represents a given color,
+// preferring the one marked primary (same rule VariantSelector uses
+// for its swatch photos), so the gallery jumps to the same photo
+// the swatch itself is showing.
+function findColorImageIndex(images, color) {
+  const candidates = images
+    .map((image, index) => ({ image, index }))
+    .filter(({ image }) => image.color === color);
+
+  if (candidates.length === 0) {
+    return -1;
+  }
+
+  const primary = candidates.find(
+    ({ image }) => image.is_primary
+  );
+
+  return (primary ?? candidates[0]).index;
+}
+
 function ProductDetailsPage() {
   // All hooks must be called before conditional returns.
   const { slug } = useParams();
@@ -17,30 +37,25 @@ function ProductDetailsPage() {
 const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] =
     useState(null);
-    const visibleImages = useMemo(() => {
+
   const images = product?.images ?? [];
 
-  if (!selectedVariant?.color) {
-    return images;
-  }
+  // The gallery always shows every photo (every color, every
+  // angle) in the thumbnail strip. Selecting a color only moves
+  // the main photo to that color's picture — it never hides the
+  // other thumbnails.
+  const activeImageIndex = useMemo(() => {
+    if (!selectedVariant?.color) {
+      return 0;
+    }
 
-  const colorImages = images.filter(
-    (image) => image.color === selectedVariant.color
-  );
+    const index = findColorImageIndex(
+      images,
+      selectedVariant.color
+    );
 
-  const generalImages = images.filter(
-    (image) => !image.color
-  );
-
-  // Color-specific photos come first so the gallery's main
-  // image (always index 0) actually shows the selected color,
-  // with the general shots available right after.
-  const orderedImages = [...colorImages, ...generalImages];
-
-  return orderedImages.length > 0
-    ? orderedImages
-    : images;
-}, [product, selectedVariant]);
+    return index === -1 ? 0 : index;
+  }, [images, selectedVariant]);
 
   useEffect(() => {
     if (product?.variants?.length > 0) {
@@ -55,7 +70,7 @@ const [quantity, setQuantity] = useState(1);
       return;
     }
 
-addItem(product, selectedVariant, quantity); 
+addItem(product, selectedVariant, quantity);
  }
 
   // Conditional returns come after every hook.
@@ -74,7 +89,11 @@ addItem(product, selectedVariant, quantity);
   return (
     <div className="product-details-page">
       <div className="product-details">
-        <ProductGallery images={visibleImages} productName={product.name} />
+        <ProductGallery
+          images={images}
+          jumpToIndex={activeImageIndex}
+          productName={product.name}
+        />
 
         <ProductInfo
           product={product}
